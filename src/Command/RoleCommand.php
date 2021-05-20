@@ -33,17 +33,17 @@ abstract class RoleCommand extends AbstractUserCommand
      * RoleCommand constructor.
      * @param EntityManagerInterface $manager
      * @param string $userClass
+     * @param string $userIdentifier
      * @param string $superAdminRole
      * @param ServiceEntityRepository|null $repo
-     * @param string|null $name
      */
-    public function __construct(EntityManagerInterface $manager, string $userClass, protected string $superAdminRole = 'ROLE_SUPER_ADMIN', ?ServiceEntityRepository $repo = null, string $name = null)
+    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, protected string $superAdminRole = 'ROLE_SUPER_ADMIN', ?ServiceEntityRepository $repo = null)
     {
         if(!is_subclass_of($userClass, CommandUserInterface::class))
         {
             throw new \InvalidArgumentException('The provided user class must implement "\Bytes\UserBundle\Entity\CommandUserInterface"');
         }
-        parent::__construct($manager, $userClass, $repo, $name);
+        parent::__construct($manager, $userClass, $userIdentifier, $repo);
     }
 
     /**
@@ -121,7 +121,7 @@ abstract class RoleCommand extends AbstractUserCommand
     {
         $repo = $this->repo;
 
-        $user = $repo->findOneBy(['username' => $username]);
+        $user = $repo->findOneBy([$this->userIdentifier => $username]);
 
         return $user;
     }

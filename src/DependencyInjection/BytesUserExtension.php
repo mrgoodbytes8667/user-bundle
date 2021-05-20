@@ -4,9 +4,7 @@
 namespace Bytes\UserBundle\DependencyInjection;
 
 
-use Bytes\UserBundle\Command\UserChangePasswordCommand;
-use Bytes\UserBundle\Command\UserDemoteCommand;
-use Bytes\UserBundle\Command\UserPromoteCommand;
+use Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -22,7 +20,7 @@ class BytesUserExtension extends Extension implements ExtensionInterface
     /**
      * @param array $configs
      * @param ContainerBuilder $container
-     * @throws \Exception
+     * @throws Exception
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -31,18 +29,26 @@ class BytesUserExtension extends Extension implements ExtensionInterface
 
         $configuration = $this->getConfiguration($configs, $container);
 
-        /** @var array $config = ['user_class' => '', 'super_admin_role' => ''] */
         $config = $this->processConfiguration($configuration, $configs);
 
         $definition = $container->getDefinition('bytes_user.command.user_change_password');
         $definition->replaceArgument(1, $config['user_class']);
+        $definition->replaceArgument(2, $config['entity']['identifier']);
+
+        $definition = $container->getDefinition('bytes_user.command.user_create');
+        $definition->replaceArgument(1, $config['user_class']);
+        $definition->replaceArgument(2, $config['entity']['identifier']);
+        $definition->replaceArgument(3, $config['entity']['email']);
+        $definition->replaceArgument(4, $config['entity']['password']);
 
         $definition = $container->getDefinition('bytes_user.command.user_promote');
         $definition->replaceArgument(1, $config['user_class']);
-        $definition->replaceArgument(2, $config['super_admin_role']);
+        $definition->replaceArgument(2, $config['entity']['identifier']);
+        $definition->replaceArgument(3, $config['super_admin_role']);
 
         $definition = $container->getDefinition('bytes_user.command.user_demote');
         $definition->replaceArgument(1, $config['user_class']);
-        $definition->replaceArgument(2, $config['super_admin_role']);
+        $definition->replaceArgument(2, $config['entity']['identifier']);
+        $definition->replaceArgument(3, $config['super_admin_role']);
     }
 }
