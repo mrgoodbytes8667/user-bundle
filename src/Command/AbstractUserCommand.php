@@ -19,16 +19,16 @@ abstract class AbstractUserCommand extends BaseEntityManagerCommand
      * AbstractUserCommand constructor.
      * @param EntityManagerInterface $manager
      * @param string $userClass
+     * @param string $userIdentifier
      * @param ServiceEntityRepository|null $repo
-     * @param string|null $name The name of the command; passing null means it must be set in configure()
      */
-    public function __construct(EntityManagerInterface $manager, protected string $userClass, protected ?ServiceEntityRepository $repo = null, string $name = null)
+    public function __construct(EntityManagerInterface $manager, protected string $userClass, protected string $userIdentifier, protected ?ServiceEntityRepository $repo = null)
     {
         if(!is_subclass_of($userClass, UserInterface::class))
         {
             throw new \InvalidArgumentException('The provided user class must implement "\Symfony\Component\Security\Core\User\UserInterface"');
         }
-        parent::__construct($manager, $name);
+        parent::__construct($manager);
         if (is_null($repo)) {
             $this->repo = $manager->getRepository($userClass);
         }

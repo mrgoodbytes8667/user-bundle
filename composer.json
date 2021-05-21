@@ -11,7 +11,10 @@
         "mrgoodbytes8667/command-bundle": "^1.1",
         "symfony/console": "^5.2",
         "symfony/framework-bundle": "^5.2",
-        "symfony/security-core": "^5.2"
+        "symfony/property-access": "^5.2",
+        "symfony/property-info": "^5.2",
+        "symfony/security-core": "^5.2",
+        "symfony/validator": "^5.2"
     },
     "require-dev": {
         "mrgoodbytes8667/test-common": ">=0.0.17",

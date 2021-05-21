@@ -31,12 +31,14 @@ class UserChangePasswordCommand extends AbstractUserCommand
     /**
      * UserChangePasswordCommand constructor.
      * @param EntityManagerInterface $manager
+     * @param string $userClass
+     * @param string $userIdentifier
      * @param UserPasswordEncoderInterface $encoder
-     * @param string|null $name The name of the command; passing null means it must be set in configure()
+     * @param ServiceEntityRepository|null $repo
      */
-    public function __construct(EntityManagerInterface $manager, string $userClass, private UserPasswordEncoderInterface $encoder, ?ServiceEntityRepository $repo = null, string $name = null)
+    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private UserPasswordEncoderInterface $encoder, ?ServiceEntityRepository $repo = null)
     {
-        parent::__construct($manager, $userClass, $repo, $name);
+        parent::__construct($manager, $userClass, $userIdentifier, $repo);
     }
 
     /**
@@ -84,7 +86,7 @@ EOT
         /** @var ServiceEntityRepository $repo */
         $repo = $this->repo;
 
-        $user = $repo->findOneBy(['username' => $username]);
+        $user = $repo->findOneBy([$this->userIdentifier => $username]);
 
         if (empty($user)) {
             throw new InvalidArgumentException('The supplied username is not found.');
