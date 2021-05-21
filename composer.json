@@ -3,23 +3,25 @@
     "description": "User management commands inspired by FOSUserBundle",
     "type": "symfony-bundle",
     "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": "^8.0",
         "doctrine/doctrine-bundle": "^2.3",
         "doctrine/orm": "^2.8",
         "illuminate/support": "^8.42",
         "mrgoodbytes8667/command-bundle": "^1.1",
-        "symfony/console": "^5.2",
-        "symfony/framework-bundle": "^5.2",
-        "symfony/property-access": "^5.2",
-        "symfony/property-info": "^5.2",
-        "symfony/security-core": "^5.2",
-        "symfony/validator": "^5.2"
+        "symfony/console": "^5.3",
+        "symfony/framework-bundle": "^5.3",
+        "symfony/property-access": "^5.3",
+        "symfony/property-info": "^5.3",
+        "symfony/security-core": "^5.3",
+        "symfony/validator": "^5.3"
     },
     "require-dev": {
         "mrgoodbytes8667/test-common": ">=0.0.17",
         "mrgoodbytes8667/test-common-faker": "^0.3.4",
-        "symfony/phpunit-bridge": "^5.2"
+        "symfony/phpunit-bridge": "^5.3"
     },
     "authors": [
         {

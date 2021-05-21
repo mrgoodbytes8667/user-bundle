@@ -6,6 +6,7 @@ use Bytes\Tests\Common\TestFullSerializerTrait;
 use Bytes\Tests\Common\TestValidatorTrait;
 use Bytes\UserBundle\Command\CreateUserCommand;
 use Bytes\UserBundle\Tests\Fixtures\Models\User;
+use Bytes\UserBundle\Tests\Fixtures\UserPasswordHasherInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -13,7 +14,6 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * Class CreateUserCommandTest
@@ -37,7 +37,7 @@ class CreateUserCommandTest extends TestCase
             ->willReturn(0);
 
         $encoder->expects($this->once())
-            ->method('encodePassword')
+            ->method('hashPassword')
             ->willReturnArgument(1);
 
         $command = new CreateUserCommand(
@@ -119,7 +119,7 @@ class CreateUserCommandTest extends TestCase
             ->willReturn(0);
 
         $encoder->expects($this->once())
-            ->method('encodePassword')
+            ->method('hashPassword')
             ->willReturnArgument(1);
 
         $command = new CreateUserCommand(
@@ -137,7 +137,7 @@ class CreateUserCommandTest extends TestCase
     public function provideMocks()
     {
         $manager = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
-        $encoder = $this->getMockBuilder(UserPasswordEncoderInterface::class)->getMock();
+        $encoder = $this->getMockBuilder(UserPasswordHasherInterface::class)->getMock();
 
         yield ['manager' => $manager, 'encoder' => $encoder];
     }

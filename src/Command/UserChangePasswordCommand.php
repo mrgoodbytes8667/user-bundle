@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Class UserChangePasswordCommand
@@ -33,10 +33,10 @@ class UserChangePasswordCommand extends AbstractUserCommand
      * @param EntityManagerInterface $manager
      * @param string $userClass
      * @param string $userIdentifier
-     * @param UserPasswordEncoderInterface $encoder
+     * @param UserPasswordHasherInterface $encoder
      * @param ServiceEntityRepository|null $repo
      */
-    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private UserPasswordEncoderInterface $encoder, ?ServiceEntityRepository $repo = null)
+    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private UserPasswordHasherInterface $encoder, ?ServiceEntityRepository $repo = null)
     {
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
     }
@@ -92,7 +92,7 @@ EOT
             throw new InvalidArgumentException('The supplied username is not found.');
         }
 
-        $password = $this->encoder->encodePassword($user, $this->input->getArgument('password'));
+        $password = $this->encoder->hashPassword($user, $this->input->getArgument('password'));
         $user->setPassword($password);
 
         $this->entityManager->flush();

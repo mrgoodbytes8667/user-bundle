@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\String\ByteString;
 use Symfony\Component\Validator\Constraints\Email;
@@ -41,7 +41,7 @@ class CreateUserCommand extends AbstractUserCommand
 
     public function __construct(
         EntityManagerInterface $manager, string $userClass, string $userIdentifier, protected string $userEmail,
-        protected string $userPassword, private UserPasswordEncoderInterface $encoder,
+        protected string $userPassword, private UserPasswordHasherInterface $encoder,
         protected PropertyInfoExtractorInterface $extractor, protected PropertyAccessorInterface $accessor,
         protected ValidatorInterface $validator, ?ServiceEntityRepository $repo = null)
     {
@@ -160,7 +160,7 @@ EOT
             $this->accessor->setValue($user, $this->userEmail, $email);
         }
         if ($this->extractor->isWritable($this->userClass, $this->userPassword)) {
-            $this->accessor->setValue($user, $this->userPassword, $this->encoder->encodePassword($user, $password));
+            $this->accessor->setValue($user, $this->userPassword, $this->encoder->hashPassword($user, $password));
         }
 
         $user = $this->initializeUser($user);
