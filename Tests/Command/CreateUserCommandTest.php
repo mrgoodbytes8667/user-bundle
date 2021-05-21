@@ -41,7 +41,7 @@ class CreateUserCommandTest extends TestCase
             ->willReturnArgument(1);
 
         $command = new CreateUserCommand(
-            $manager, User::class, 'username', 'email', 'password', $encoder,
+            $manager, User::class, 'username', 'email', 'password', ['ROLE_ADMIN', 'ROLE_USER'], $encoder,
             $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
         $tester = new CommandTester($command);
 
@@ -74,7 +74,7 @@ class CreateUserCommandTest extends TestCase
             ->willReturn(1);
 
         $command = new CreateUserCommand(
-            $manager, User::class, 'username', 'email', 'password', $encoder,
+            $manager, User::class, 'username', 'email', 'password', ['ROLE_ADMIN', 'ROLE_USER'], $encoder,
             $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
         $tester = new CommandTester($command);
         $tester = new CommandTester($command);
@@ -96,7 +96,7 @@ class CreateUserCommandTest extends TestCase
             ->will($this->onConsecutiveCalls(0, 1));
 
         $command = new CreateUserCommand(
-            $manager, User::class, 'username', 'email', 'password', $encoder,
+            $manager, User::class, 'username', 'email', 'password', ['ROLE_ADMIN', 'ROLE_USER'], $encoder,
             $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
         $tester = new CommandTester($command);
         $tester = new CommandTester($command);
@@ -123,7 +123,7 @@ class CreateUserCommandTest extends TestCase
             ->willReturnArgument(1);
 
         $command = new CreateUserCommand(
-            $manager, User::class, 'username', 'email', 'password', $encoder,
+            $manager, User::class, 'username', 'email', 'password', ['ROLE_ADMIN', 'ROLE_USER'], $encoder,
             $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
         $tester = new CommandTester($command);
 

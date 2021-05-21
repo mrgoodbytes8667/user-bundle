@@ -21,7 +21,7 @@ return static function (ContainerConfigurator $container) {
             service('doctrine.orm.default_entity_manager'), // Doctrine\ORM\EntityManagerInterface
             '',
             '',
-            service('security.password_hasher'), // \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface
+            service('security.password_hasher'), // Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface
         ])
         ->tag('console.command', ['command' => 'bytes:user:change-password']);
 
@@ -32,6 +32,7 @@ return static function (ContainerConfigurator $container) {
             '', // user_identifier
             '', // user_email
             '', // user_password
+            [], // default_roles
             service('security.password_hasher'), // \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface
             service('property_info'),
             service('property_accessor'),

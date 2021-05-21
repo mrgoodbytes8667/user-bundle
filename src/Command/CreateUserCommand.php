@@ -4,6 +4,7 @@
 namespace Bytes\UserBundle\Command;
 
 
+use Bytes\UserBundle\Entity\CommandUserInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,6 +30,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class CreateUserCommand extends AbstractUserCommand
 {
+    use RoleTrait;
+
     /**
      * @var string|null The default command name
      */
@@ -41,10 +44,17 @@ class CreateUserCommand extends AbstractUserCommand
 
     public function __construct(
         EntityManagerInterface $manager, string $userClass, string $userIdentifier, protected string $userEmail,
-        protected string $userPassword, private UserPasswordHasherInterface $encoder,
+        protected string $userPassword, protected array $defaultRoles, private UserPasswordHasherInterface $encoder,
         protected PropertyInfoExtractorInterface $extractor, protected PropertyAccessorInterface $accessor,
         protected ValidatorInterface $validator, ?ServiceEntityRepository $repo = null)
     {
+        foreach ($defaultRoles as $role)
+        {
+            if(!$this->validateRoleName($role))
+            {
+                throw new InvalidArgumentException('Default roles do not pass the validation test.');
+            }
+        }
         $this->needsOutput = true;
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
 
@@ -153,6 +163,7 @@ EOT
         }
 
         $class = $this->userClass;
+        /** @var CommandUserInterface $user */
         $user = new $class();
 
         $this->accessor->setValue($user, $this->userIdentifier, $username);
@@ -162,6 +173,7 @@ EOT
         if ($this->extractor->isWritable($this->userClass, $this->userPassword)) {
             $this->accessor->setValue($user, $this->userPassword, $this->encoder->hashPassword($user, $password));
         }
+        $user->setRoles($this->defaultRoles);
 
         $user = $this->initializeUser($user);
 
