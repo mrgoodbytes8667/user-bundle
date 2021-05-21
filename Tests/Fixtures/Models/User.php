@@ -180,4 +180,13 @@ class User implements CommandUserInterface
     public function eraseCredentials()
     {
     }
+
+    /**
+     * Returns the identifier for this user (e.g. its username or e-mail address)
+     * @return string
+     */
+    public function getUserIdentifier()
+    {
+        return $this->getUsername();
+    }
 }
