@@ -40,6 +40,7 @@ class BytesUserExtension extends Extension implements ExtensionInterface
         $definition->replaceArgument(2, $config['entity']['identifier']);
         $definition->replaceArgument(3, $config['entity']['email']);
         $definition->replaceArgument(4, $config['entity']['password']);
+        $definition->replaceArgument(5, $config['default_roles']);
 
         $definition = $container->getDefinition('bytes_user.command.user_promote');
         $definition->replaceArgument(1, $config['user_class']);

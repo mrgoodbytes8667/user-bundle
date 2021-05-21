@@ -26,4 +26,10 @@ interface CommandUserInterface extends \Symfony\Component\Security\Core\User\Use
      * @return $this
      */
     public function removeRole(string $role);
+
+    /**
+     * @param array $roles
+     * @return $this
+     */
+    public function setRoles(array $roles);
 }

@@ -24,6 +24,8 @@ use function Symfony\Component\String\u;
  */
 abstract class RoleCommand extends AbstractUserCommand
 {
+    use RoleTrait;
+
     /**
      * @var OutputInterface
      */
@@ -124,15 +126,6 @@ abstract class RoleCommand extends AbstractUserCommand
         $user = $repo->findOneBy([$this->userIdentifier => $username]);
 
         return $user;
-    }
-
-    /**
-     * @param string $role
-     * @return bool
-     */
-    protected function validateRoleName(string $role)
-    {
-        return u($role)->startsWith('ROLE_');
     }
 
     /**
