@@ -32,6 +32,7 @@ return static function (ContainerConfigurator $container) {
             '', // user_identifier
             '', // user_email
             '', // user_password
+            [], // default_roles
             service('security.user_password_encoder.generic'), // \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface
             service('property_info'),
             service('property_accessor'),
