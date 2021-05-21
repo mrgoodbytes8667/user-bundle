@@ -14,6 +14,8 @@
         "symfony/security-core": "^5.2"
     },
     "require-dev": {
+        "mrgoodbytes8667/test-common": ">=0.0.17",
+        "mrgoodbytes8667/test-common-faker": "^0.3.4",
         "symfony/phpunit-bridge": "^5.2"
     },
     "authors": [
