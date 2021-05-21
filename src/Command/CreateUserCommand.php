@@ -18,10 +18,8 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\String\ByteString;
-use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
