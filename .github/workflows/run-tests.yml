@@ -3,13 +3,15 @@ name: tests
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the main branch
 on:
-  workflow_dispatch:
   pull_request:
+  workflow_dispatch:
+  repository_dispatch:
   push:
     branches:
       - "main"
-      - "dev"
-  repository_dispatch:
+  schedule:
+    # Weekly on Thursdays at 2pm UTC
+    - cron:  '0 14 * * 4'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -23,7 +25,6 @@ jobs:
         php: [ 8.0 ]
         dependency-version: [ prefer-stable, prefer-lowest ]
         os: [ubuntu-latest]
-        phpuniturl: ["https://raw.githubusercontent.com/symfony/recipes/master/symfony/phpunit-bridge/4.3/bin/phpunit"]
     env:
       SYMFONY_PHPUNIT_VERSION: 9.5
 
@@ -31,11 +32,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Sha256 PHPUnit Recipe
-        id: phpunit-sha256
-        run: |
-          echo "::set-output name=sha::$(${{ matrix.phpuniturl }} | openssl dgst -binary -sha1 | openssl base64 | sed -e 's/[^a-zA-Z0-9]/_/g')"
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -50,16 +46,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php${{ matrix.php }}-composer-
 
-      - name: Cache PHPUnit
-        uses: actions/cache@v2
-        with:
-          path: |
-            bin/phpunit
-            bin/.phpunit
-          key: ${{ runner.os }}-php${{ matrix.php }}-phpunit-${{ steps.phpunit-sha256.outputs.sha }}
-          restore-keys: |
-            ${{ runner.os }}-php${{ matrix.php }}-phpunit-${{ steps.phpunit-sha256.outputs.sha }}
-
       - name: Setup PHP
         if: success()
         uses: shivammathur/setup-php@v2
@@ -72,22 +58,6 @@ jobs:
         if: success()
         run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
-      - name: Check file existence
+      - name: Run PHPUnit
         if: success()
-        id: check-files
-        uses: andstor/file-existence-action@v1
-        with:
-          files: "bin/phpunit"
-
-      - name: Get PHPUnit-Bridge Recipe
-        if: success() && steps.check-files.outputs.files_exists == 'false'
-        run: |
-          mkdir -p bin
-          cd bin
-          rm -f phpunit
-          wget ${{ matrix.phpuniturl }}
-          cd ../
-
-      - name: Setup and Run PHPUnit
-        if: success()
-        run: php bin/phpunit
+        run: php vendor/bin/phpunit
