@@ -3,8 +3,6 @@
     "description": "User management commands inspired by FOSUserBundle",
     "type": "symfony-bundle",
     "license": "MIT",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": "^8.0",
         "doctrine/doctrine-bundle": "^2.3",
