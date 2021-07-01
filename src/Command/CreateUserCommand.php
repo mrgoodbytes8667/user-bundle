@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\String\ByteString;
 use Symfony\Component\Validator\Constraints\Email;
@@ -42,23 +42,9 @@ class CreateUserCommand extends AbstractUserCommand
      */
     protected static $defaultDescription = 'Create a user';
 
-    /**
-     * CreateUserCommand constructor.
-     * @param EntityManagerInterface $manager
-     * @param string $userClass
-     * @param string $userIdentifier
-     * @param string $userEmail
-     * @param string $userPassword
-     * @param string[] $defaultRoles
-     * @param UserPasswordEncoderInterface $encoder
-     * @param PropertyInfoExtractorInterface $extractor
-     * @param PropertyAccessorInterface $accessor
-     * @param ValidatorInterface $validator
-     * @param ServiceEntityRepository|null $repo
-     */
     public function __construct(
         EntityManagerInterface $manager, string $userClass, string $userIdentifier, protected string $userEmail,
-        protected string $userPassword, protected array $defaultRoles, private UserPasswordEncoderInterface $encoder,
+        protected string $userPassword, protected array $defaultRoles, private UserPasswordHasherInterface $encoder,
         protected PropertyInfoExtractorInterface $extractor, protected PropertyAccessorInterface $accessor,
         protected ValidatorInterface $validator, ?ServiceEntityRepository $repo = null)
     {
@@ -185,7 +171,7 @@ EOT
             $this->accessor->setValue($user, $this->userEmail, $email);
         }
         if ($this->extractor->isWritable($this->userClass, $this->userPassword)) {
-            $this->accessor->setValue($user, $this->userPassword, $this->encoder->encodePassword($user, $password));
+            $this->accessor->setValue($user, $this->userPassword, $this->encoder->hashPassword($user, $password));
         }
         $user->setRoles($this->defaultRoles);
 

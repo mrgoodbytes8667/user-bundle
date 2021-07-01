@@ -29,12 +29,13 @@ use Faker\Provider\PhoneNumber;
 use Faker\Provider\Text;
 use Faker\Provider\UserAgent;
 use Faker\Provider\Uuid;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * Class User
  * @package Bytes\UserBundle\Tests\Fixtures\Models
  */
-class User implements CommandUserInterface
+class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
 {
     use CommandUserTrait;
 
@@ -65,6 +66,17 @@ class User implements CommandUserInterface
     }
 
     /**
+     * @return FakerGenerator|MiscProvider|Address|Barcode|Biased|Color|Company|DateTime|File|HtmlLorem|Image|Internet|Lorem|Medical|Miscellaneous|Payment|Person|PhoneNumber|Text|UserAgent|Uuid
+     */
+    private static function getFaker()
+    {
+        $faker = Factory::create();
+        $faker->addProvider(new MiscProvider($faker));
+
+        return $faker;
+    }
+
+    /**
      * @param string|null $username
      * @param string|null $email
      * @param string|null $password
@@ -81,17 +93,6 @@ class User implements CommandUserInterface
         $this->setRoles($roles ?? $faker->words(3));
 
         return $this;
-    }
-
-    /**
-     * @return FakerGenerator|MiscProvider|Address|Barcode|Biased|Color|Company|DateTime|File|HtmlLorem|Image|Internet|Lorem|Medical|Miscellaneous|Payment|Person|PhoneNumber|Text|UserAgent|Uuid
-     */
-    private static function getFaker()
-    {
-        $faker = Factory::create();
-        $faker->addProvider(new MiscProvider($faker));
-
-        return $faker;
     }
 
     /**
@@ -132,14 +133,6 @@ class User implements CommandUserInterface
     {
         $this->roles = $roles;
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUsername(): string
-    {
-        return $this->username;
     }
 
     /**
@@ -188,5 +181,13 @@ class User implements CommandUserInterface
     public function getUserIdentifier()
     {
         return $this->getUsername();
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
     }
 }

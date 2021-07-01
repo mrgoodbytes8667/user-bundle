@@ -5,6 +5,7 @@ namespace Bytes\UserBundle\Tests\Command;
 use Bytes\UserBundle\Command\UserChangePasswordCommand;
 use Bytes\UserBundle\Entity\CommandUserInterface;
 use Bytes\UserBundle\Tests\Fixtures\Models\User;
+use Bytes\UserBundle\Tests\Fixtures\UserPasswordHasherInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -13,7 +14,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * Class UserChangePasswordCommandTest
@@ -33,7 +33,7 @@ class UserChangePasswordCommandTest extends TestCase
         $user = User::random('john');
         $repo = $this->getMockRepo($user);
         $encoder->expects($this->once())
-            ->method('encodePassword')
+            ->method('hashPassword')
             ->willReturnArgument(1);
 
         $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
@@ -85,7 +85,7 @@ class UserChangePasswordCommandTest extends TestCase
     public function provideMocks()
     {
         $manager = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
-        $encoder = $this->getMockBuilder(UserPasswordEncoderInterface::class)->getMock();
+        $encoder = $this->getMockBuilder(UserPasswordHasherInterface::class)->getMock();
         $userClass = $this->getMockBuilder(CommandUserInterface::class)->getMock();
 
         yield ['manager' => $manager, 'encoder' => $encoder, 'userClass' => $userClass];

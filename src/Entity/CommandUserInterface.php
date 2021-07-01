@@ -4,7 +4,13 @@
 namespace Bytes\UserBundle\Entity;
 
 
-interface CommandUserInterface extends \Symfony\Component\Security\Core\User\UserInterface
+use Symfony\Component\Security\Core\User\UserInterface;
+
+/**
+ * Interface CommandUserInterface
+ * @package Bytes\UserBundle\Entity
+ */
+interface CommandUserInterface extends UserInterface
 {
     /**
      * @param string $role
