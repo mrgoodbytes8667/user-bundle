@@ -99,7 +99,7 @@ class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
      * @param string $username
      * @return $this
      */
-    public function setUsername(string $username): self
+    public function setUsername(string $username): static
     {
         $this->username = $username;
         return $this;
@@ -109,7 +109,7 @@ class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
      * @param string $email
      * @return $this
      */
-    public function setEmail(string $email): self
+    public function setEmail(string $email): static
     {
         $this->email = $email;
         return $this;
@@ -119,7 +119,7 @@ class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
      * @param string $password
      * @return $this
      */
-    public function setPassword(string $password): self
+    public function setPassword(string $password): static
     {
         $this->password = $password;
         return $this;
@@ -129,7 +129,7 @@ class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
      * @param array $roles
      * @return $this
      */
-    public function setRoles(array $roles): self
+    public function setRoles(array $roles): static
     {
         $this->roles = $roles;
         return $this;
@@ -178,7 +178,7 @@ class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
      * Returns the identifier for this user (e.g. its username or e-mail address)
      * @return string
      */
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->getUsername();
     }
