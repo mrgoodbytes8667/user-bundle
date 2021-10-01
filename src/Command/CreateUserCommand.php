@@ -55,7 +55,6 @@ class CreateUserCommand extends AbstractUserCommand
                 throw new InvalidArgumentException('Default roles do not pass the validation test.');
             }
         }
-        $this->needsOutput = true;
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
 
         if (!$extractor->isWritable($userClass, $userIdentifier)) {
