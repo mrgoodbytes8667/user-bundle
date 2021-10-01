@@ -18,6 +18,8 @@ jobs:
     strategy:
       matrix:
         php: [ 8.0 ]
+    env:
+      SYMFONY_PHPUNIT_VERSION: 9.5
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
