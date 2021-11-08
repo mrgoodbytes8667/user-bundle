@@ -5,7 +5,6 @@ namespace Bytes\UserBundle\Entity;
 
 
 use Doctrine\ORM\Mapping as ORM;
-use Illuminate\Support\Arr;
 
 /**
  * Trait CommandUserTrait
@@ -26,7 +25,7 @@ trait CommandUserTrait
      */
     public function hasRole(string|array $role): bool
     {
-        $roles = Arr::wrap($role);
+        $roles = is_array($role) ? $role : [$role];
         foreach ($roles as $role) {
             if (!is_string($role)) {
                 continue;
