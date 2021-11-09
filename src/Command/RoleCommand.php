@@ -36,8 +36,6 @@ abstract class RoleCommand extends AbstractUserCommand
      */
     protected $output;
 
-    private ArrayCollection $roles;
-
     /**
      * RoleCommand constructor.
      * @param EntityManagerInterface $manager
@@ -60,25 +58,6 @@ abstract class RoleCommand extends AbstractUserCommand
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         $this->completeUsername($input, $suggestions);
-
-        if ($input->mustSuggestArgumentValuesFor('role')) {
-            /** @var UserInterface[] $users */
-            $users = $this->repo->findAll() ?? [];
-            $this->roles = new ArrayCollection();
-
-            foreach ($users as $user)
-            {
-                foreach ($user->getRoles() as $role)
-                {
-                    $this->addIfNotExists($role);
-                }
-            }
-            $this->addIfNotExists($this->superAdminRole);
-
-            $suggestions->suggestValues($this->roles->toArray());
-
-            unset($this->roles);
-        }
     }
 
     /**
@@ -194,16 +173,6 @@ abstract class RoleCommand extends AbstractUserCommand
         foreach ($questions as $name => $question) {
             $answer = $this->getHelper('question')->ask($input, $output, $question);
             $input->setArgument($name, $answer);
-        }
-    }
-
-    /**
-     * @param string $role
-     */
-    protected function addIfNotExists(string $role): void
-    {
-        if (!$this->roles->contains($role)) {
-            $this->roles->add($role);
         }
     }
 }

@@ -66,7 +66,13 @@ class UserDemoteCommandTest extends TestCase
     {
         $user = User::random('john');
         $user->setRoles(array_merge($user->getRoles(), ['ROLE_USER', 'ROLE_TEST']));
-        $repo = $this->getMockRepoAll($user, $this->once());
+
+        $repo = $this->getMockBuilder(ServiceEntityRepository::class)->disableOriginalConstructor()->getMock();
+
+        $repo->method('findOneBy')
+            ->willReturn($user);
+        $repo->method('findAll')
+            ->willReturn([$user]);
 
         foreach ($this->provideMocks() as $mocks) {
             list('manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor) = $mocks;
@@ -82,21 +88,6 @@ class UserDemoteCommandTest extends TestCase
                 $this->assertContains($expectedSuggestion, $suggestions);
             }
         }
-    }
-
-    /**
-     * @param User|null $user
-     * @return ServiceEntityRepository
-     */
-    private function getMockRepoAll(?User $user = null, ?InvokedCount $expects = null)
-    {
-        $repo = $this->getMockBuilder(ServiceEntityRepository::class)->disableOriginalConstructor()->getMock();
-
-        $repo->expects($expects)
-            ->method('findAll')
-            ->willReturn([$user]);
-
-        return $repo;
     }
 
     /**
@@ -119,8 +110,8 @@ class UserDemoteCommandTest extends TestCase
     {
         yield 'search' => [[''], ['john']];
         yield 'search j' => [['j'], ['john']];
-        yield 'role R' => [['john', 'R'], ['ROLE_SUPER_ADMIN', 'ROLE_USER', 'ROLE_TEST']];
-        yield 'role' => [['john', ''], ['ROLE_SUPER_ADMIN', 'ROLE_USER', 'ROLE_TEST']];
+        yield 'role R' => [['john', 'R'], ['ROLE_USER', 'ROLE_TEST']];
+        yield 'role' => [['john', ''], ['ROLE_USER', 'ROLE_TEST']];
         yield 'role ROLE_U' => [['john', 'ROLE_U'], ['ROLE_USER']];
     }
 }
