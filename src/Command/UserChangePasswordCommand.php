@@ -14,7 +14,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Class UserChangePasswordCommand
@@ -26,6 +25,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class UserChangePasswordCommand extends AbstractUserCommand
 {
+    use UsernameCompletionTrait;
+
     /**
      * @var string|null The default command name
      */
@@ -36,10 +37,9 @@ class UserChangePasswordCommand extends AbstractUserCommand
      * @param string $userClass
      * @param string $userIdentifier
      * @param UserPasswordHasherInterface $encoder
-     * @param PropertyAccessorInterface $accessor
      * @param ServiceEntityRepository|null $repo
      */
-    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private UserPasswordHasherInterface $encoder, private PropertyAccessorInterface $accessor, ?ServiceEntityRepository $repo = null)
+    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private UserPasswordHasherInterface $encoder, ?ServiceEntityRepository $repo = null)
     {
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
     }
@@ -49,13 +49,7 @@ class UserChangePasswordCommand extends AbstractUserCommand
      */
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
-        if ($input->mustSuggestArgumentValuesFor('username')) {
-            $users = $this->repo->findAll();
-
-            $suggestions->suggestValues(array_map(function ($value) {
-                return $this->accessor->getValue($value, $this->userIdentifier);
-            }, $users));
-        }
+        $this->completeUsername($input, $suggestions);
     }
 
     /**

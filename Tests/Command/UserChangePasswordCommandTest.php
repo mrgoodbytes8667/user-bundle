@@ -38,7 +38,8 @@ class UserChangePasswordCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $accessor, $repo);
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
+        $command->setAccessor($accessor);
         $tester = new CommandTester($command);
 
         $tester->execute(['username' => 'john', 'password' => 'abc123']);
@@ -72,7 +73,8 @@ class UserChangePasswordCommandTest extends TestCase
     {
         $repo = $this->getMockRepo();
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $accessor, $repo);
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
+        $command->setAccessor($accessor);
         $tester = new CommandTester($command);
 
         $this->expectException(InvalidArgumentException::class);
