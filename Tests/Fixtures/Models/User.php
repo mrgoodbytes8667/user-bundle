@@ -30,6 +30,7 @@ use Faker\Provider\Text;
 use Faker\Provider\UserAgent;
 use Faker\Provider\Uuid;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use function Symfony\Component\String\u;
 
 /**
  * Class User
@@ -61,8 +62,9 @@ class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
     public static function random(?string $username = null, ?string $email = null, ?string $password = null, ?array $roles = null): static
     {
         $faker = static::getFaker();
-        return new static($username ?? $faker->userName(), $email ?? $faker->email(),
-            $password ?? $faker->randomAlphanumericString(), $roles ?? $faker->words(3));
+        $static = new static($username ?? $faker->userName(), $email ?? $faker->email(),
+            $password ?? $faker->randomAlphanumericString());
+        return $static->setRoles($roles ?? $faker->words(3));
     }
 
     /**
@@ -131,6 +133,13 @@ class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
      */
     public function setRoles(array $roles): static
     {
+        foreach ($roles as $index => $role)
+        {
+            $role = u($role);
+            if(!$role->startsWith('ROLE_')) {
+                $roles[$index] = $role->prepend('Role_')->snake()->upper()->toString();
+            }
+        }
         $this->roles = $roles;
         return $this;
     }
