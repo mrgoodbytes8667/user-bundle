@@ -22,6 +22,7 @@ return static function (ContainerConfigurator $container) {
             '',
             '',
             service('security.password_hasher'), // Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface
+            service('property_accessor'),
         ])
         ->tag('console.command', ['command' => 'bytes:user:change-password']);
 

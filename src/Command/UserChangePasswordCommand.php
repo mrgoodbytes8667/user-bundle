@@ -6,12 +6,15 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Class UserChangePasswordCommand
@@ -29,16 +32,30 @@ class UserChangePasswordCommand extends AbstractUserCommand
     protected static $defaultName = 'bytes:user:change-password';
 
     /**
-     * UserChangePasswordCommand constructor.
      * @param EntityManagerInterface $manager
      * @param string $userClass
      * @param string $userIdentifier
      * @param UserPasswordHasherInterface $encoder
+     * @param PropertyAccessorInterface $accessor
      * @param ServiceEntityRepository|null $repo
      */
-    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private UserPasswordHasherInterface $encoder, ?ServiceEntityRepository $repo = null)
+    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private UserPasswordHasherInterface $encoder, private PropertyAccessorInterface $accessor, ?ServiceEntityRepository $repo = null)
     {
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
+    }
+
+    /**
+     * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
+     */
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('username')) {
+            $users = $this->repo->findAll();
+
+            $suggestions->suggestValues(array_map(function ($value) {
+                return $this->accessor->getValue($value, $this->userIdentifier);
+            }, $users));
+        }
     }
 
     /**
