@@ -3,8 +3,11 @@
 namespace Bytes\UserBundle\Command;
 
 use Bytes\UserBundle\Entity\CommandUserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -21,6 +24,35 @@ class UserPromoteCommand extends RoleCommand
      * @var string
      */
     protected static $defaultName = 'bytes:user:promote';
+
+    private ArrayCollection $roles;
+
+    /**
+     * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
+     */
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        parent::complete($input, $suggestions);
+
+        if ($input->mustSuggestArgumentValuesFor('role')) {
+            /** @var UserInterface[] $users */
+            $users = $this->repo->findAll() ?? [];
+            $this->roles = new ArrayCollection();
+
+            foreach ($users as $user)
+            {
+                foreach ($user->getRoles() as $role)
+                {
+                    $this->addIfNotExists($role);
+                }
+            }
+            $this->addIfNotExists($this->superAdminRole);
+
+            $suggestions->suggestValues($this->roles->toArray());
+
+            unset($this->roles);
+        }
+    }
 
     /**
      *
@@ -67,6 +99,16 @@ EOT
             } else {
                 $this->output->writeln(sprintf('User "%s" did already have "%s" role.', $user->getUsername(), $role));
             }
+        }
+    }
+
+    /**
+     * @param string $role
+     */
+    protected function addIfNotExists(string $role): void
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles->add($role);
         }
     }
 }

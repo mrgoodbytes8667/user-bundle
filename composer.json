@@ -8,7 +8,7 @@
         "doctrine/doctrine-bundle": "^2.3",
         "doctrine/orm": "^2.8",
         "mrgoodbytes8667/command-bundle": "^1.2.2",
-        "symfony/console": "^5.3 | ^6.0",
+        "symfony/console": "^5.4 | ^6.0",
         "symfony/framework-bundle": "^5.3 | ^6.0",
         "symfony/property-access": "^5.3 | ^6.0",
         "symfony/property-info": "^5.3 | ^6.0",
@@ -37,5 +37,6 @@
             "Bytes\\UserBundle\\": "src/",
             "Bytes\\UserBundle\\Tests\\": "Tests/"
         }
-    }
+    },
+    "minimum-stability": "beta"
 }

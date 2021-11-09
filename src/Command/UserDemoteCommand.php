@@ -5,6 +5,8 @@ namespace Bytes\UserBundle\Command;
 use Bytes\UserBundle\Entity\CommandUserInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -21,6 +23,22 @@ class UserDemoteCommand extends RoleCommand
      * @var string
      */
     protected static $defaultName = 'bytes:user:demote';
+
+    /**
+     * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
+     */
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        parent::complete($input, $suggestions);
+
+        if ($input->mustSuggestArgumentValuesFor('role')) {
+            $user = $this->findUser($input->getArgument('username'));
+
+            $suggestions->suggestValues($user->getRoles());
+
+            unset($this->roles);
+        }
+    }
 
     /**
      *

@@ -6,6 +6,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,13 +25,14 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class UserChangePasswordCommand extends AbstractUserCommand
 {
+    use UsernameCompletionTrait;
+
     /**
      * @var string|null The default command name
      */
     protected static $defaultName = 'bytes:user:change-password';
 
     /**
-     * UserChangePasswordCommand constructor.
      * @param EntityManagerInterface $manager
      * @param string $userClass
      * @param string $userIdentifier
@@ -39,6 +42,14 @@ class UserChangePasswordCommand extends AbstractUserCommand
     public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private UserPasswordHasherInterface $encoder, ?ServiceEntityRepository $repo = null)
     {
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
+    }
+
+    /**
+     * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
+     */
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        $this->completeUsername($input, $suggestions);
     }
 
     /**

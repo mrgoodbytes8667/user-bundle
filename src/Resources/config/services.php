@@ -23,6 +23,7 @@ return static function (ContainerConfigurator $container) {
             '',
             service('security.password_hasher'), // Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface
         ])
+        ->call('setAccessor', [service('property_accessor')])
         ->tag('console.command', ['command' => 'bytes:user:change-password']);
 
     $services->set('bytes_user.command.user_create', CreateUserCommand::class)
@@ -47,6 +48,7 @@ return static function (ContainerConfigurator $container) {
             '',
             '',
         ])
+        ->call('setAccessor', [service('property_accessor')])
         ->tag('console.command', ['command' => 'bytes:user:promote']);
 
     $services->set('bytes_user.command.user_demote', UserDemoteCommand::class)
@@ -56,5 +58,6 @@ return static function (ContainerConfigurator $container) {
             '',
             '',
         ])
+        ->call('setAccessor', [service('property_accessor')])
         ->tag('console.command', ['command' => 'bytes:user:demote']);
 };

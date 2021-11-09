@@ -3,52 +3,43 @@
 namespace Bytes\UserBundle\Tests\Command;
 
 use Bytes\Tests\Common\TestExtractorTrait;
-use Bytes\UserBundle\Command\UserChangePasswordCommand;
 use Bytes\UserBundle\Command\UserPromoteCommand;
 use Bytes\UserBundle\Entity\CommandUserInterface;
 use Bytes\UserBundle\Tests\Fixtures\Models\User;
-use Bytes\UserBundle\Tests\Fixtures\UserPasswordHasherInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Generator;
-use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 
 /**
- * Class UserChangePasswordCommandTest
- * @package Bytes\UserBundle\Tests\Command
+ *
  */
-class UserChangePasswordCommandTest extends TestCase
+class UserPromoteCommandTest extends TestCase
 {
     use TestExtractorTrait;
 
     /**
      * @dataProvider provideMocks
      * @param $manager
-     * @param $encoder
      * @param $userClass
      * @param $accessor
      * @throws Exception
      */
-    public function testUserChangePasswordCommandExecute($manager, $encoder, $userClass, $accessor)
+    public function testUserPromoteCommandExecute($manager, $userClass, $accessor)
     {
         $user = User::random('john');
         $repo = $this->getMockRepo($user);
-        $encoder->expects($this->once())
-            ->method('hashPassword')
-            ->willReturnArgument(1);
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
+        $command = new UserPromoteCommand($manager, $userClass::class, 'username', repo: $repo);
         $command->setAccessor($accessor);
         $tester = new CommandTester($command);
 
-        $tester->execute(['username' => 'john', 'password' => 'abc123']);
+        $tester->execute(['username' => 'john', 'role' => 'ROLE_TEST']);
         $this->assertEquals(Command::SUCCESS, $tester->getStatusCode());
 
     }
@@ -69,41 +60,6 @@ class UserChangePasswordCommandTest extends TestCase
     }
 
     /**
-     * @dataProvider provideMocks
-     * @param $manager
-     * @param $encoder
-     * @param $userClass
-     * @param $accessor
-     */
-    public function testUserChangePasswordCommandExecuteInvalidUser($manager, $encoder, $userClass, $accessor)
-    {
-        $repo = $this->getMockRepo();
-
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
-        $command->setAccessor($accessor);
-        $tester = new CommandTester($command);
-
-        $this->expectException(InvalidArgumentException::class);
-
-        $tester->execute(['username' => 'john', 'password' => 'abc123']);
-
-    }
-
-    /**
-     * @return Generator
-     */
-    public function provideMocks()
-    {
-        $this->setupExtractorParts();
-        $manager = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
-        $encoder = $this->getMockBuilder(UserPasswordHasherInterface::class)->getMock();
-        $userClass = $this->getMockBuilder(CommandUserInterface::class)->getMock();
-        $accessor = $this->propertyAccessor;
-
-        yield ['manager' => $manager, 'encoder' => $encoder, 'userClass' => $userClass, 'accessor' => $accessor];
-    }
-
-    /**
      * @dataProvider provideCompletionSuggestions
      */
     public function testComplete(array $input, array $expectedSuggestions)
@@ -113,9 +69,9 @@ class UserChangePasswordCommandTest extends TestCase
         $repo = $this->getMockRepoAll($user, $this->once());
 
         foreach ($this->provideMocks() as $mocks) {
-            list('manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor, 'encoder' => $encoder) = $mocks;
+            list('manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor) = $mocks;
 
-            $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
+            $command = new UserPromoteCommand($manager, $userClass::class, 'username', repo: $repo);
             $command->setAccessor($accessor);
 
             $tester = new CommandCompletionTester($command);
@@ -126,15 +82,6 @@ class UserChangePasswordCommandTest extends TestCase
                 $this->assertContains($expectedSuggestion, $suggestions);
             }
         }
-    }
-
-    /**
-     * @return Generator
-     */
-    public function provideCompletionSuggestions(): Generator
-    {
-        yield 'search' => [[''], ['john']];
-        yield 'search j' => [['j'], ['john']];
     }
 
     /**
@@ -150,5 +97,30 @@ class UserChangePasswordCommandTest extends TestCase
             ->willReturn([$user]);
 
         return $repo;
+    }
+
+    /**
+     * @return Generator
+     */
+    public function provideMocks()
+    {
+        $this->setupExtractorParts();
+        $manager = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
+        $userClass = $this->getMockBuilder(CommandUserInterface::class)->getMock();
+        $accessor = $this->propertyAccessor;
+
+        yield ['manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor];
+    }
+
+    /**
+     * @return Generator
+     */
+    public function provideCompletionSuggestions(): Generator
+    {
+        yield 'search' => [[''], ['john']];
+        yield 'search j' => [['j'], ['john']];
+        yield 'role R' => [['john', 'R'], ['ROLE_SUPER_ADMIN', 'ROLE_USER', 'ROLE_TEST']];
+        yield 'role' => [['john', ''], ['ROLE_SUPER_ADMIN', 'ROLE_USER', 'ROLE_TEST']];
+        yield 'role ROLE_U' => [['john', 'ROLE_U'], ['ROLE_USER']];
     }
 }
