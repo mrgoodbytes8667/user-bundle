@@ -8,6 +8,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 trait UsernameCompletionTrait
 {
+    /**
+     * @var PropertyAccessorInterface
+     */
     private PropertyAccessorInterface $accessor;
 
     /**
