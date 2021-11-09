@@ -9,11 +9,11 @@
         "doctrine/orm": "^2.8",
         "mrgoodbytes8667/command-bundle": "^1.2.2",
         "symfony/console": "^5.4 | ^6.0",
-        "symfony/framework-bundle": "^5.3 | ^6.0",
-        "symfony/property-access": "^5.3 | ^6.0",
-        "symfony/property-info": "^5.3 | ^6.0",
-        "symfony/security-core": "^5.3 | ^6.0",
-        "symfony/validator": "^5.3 | ^6.0"
+        "symfony/framework-bundle": "^5.4 | ^6.0",
+        "symfony/property-access": "^5.4 | ^6.0",
+        "symfony/property-info": "^5.4 | ^6.0",
+        "symfony/security-core": "^5.4 | ^6.0",
+        "symfony/validator": "^5.4 | ^6.0"
     },
     "require-dev": {
         "mrgoodbytes8667/test-common": ">=0.0.23",
@@ -38,5 +38,5 @@
             "Bytes\\UserBundle\\Tests\\": "Tests/"
         }
     },
-    "minimum-stability": "beta"
+    "minimum-stability": "dev"
 }
