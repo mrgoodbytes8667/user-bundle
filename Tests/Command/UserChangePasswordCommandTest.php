@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Class UserChangePasswordCommandTest
@@ -26,9 +27,10 @@ class UserChangePasswordCommandTest extends TestCase
      * @param $manager
      * @param $encoder
      * @param $userClass
+     * @param $accessor
      * @throws Exception
      */
-    public function testUserChangePasswordCommandExecute($manager, $encoder, $userClass)
+    public function testUserChangePasswordCommandExecute($manager, $encoder, $userClass, $accessor)
     {
         $user = User::random('john');
         $repo = $this->getMockRepo($user);
@@ -36,7 +38,7 @@ class UserChangePasswordCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $accessor, $repo);
         $tester = new CommandTester($command);
 
         $tester->execute(['username' => 'john', 'password' => 'abc123']);
@@ -64,13 +66,13 @@ class UserChangePasswordCommandTest extends TestCase
      * @param $manager
      * @param $encoder
      * @param $userClass
-     * @throws Exception
+     * @param $accessor
      */
-    public function testUserChangePasswordCommandExecuteInvalidUser($manager, $encoder, $userClass)
+    public function testUserChangePasswordCommandExecuteInvalidUser($manager, $encoder, $userClass, $accessor)
     {
         $repo = $this->getMockRepo();
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $accessor, $repo);
         $tester = new CommandTester($command);
 
         $this->expectException(InvalidArgumentException::class);
@@ -87,7 +89,8 @@ class UserChangePasswordCommandTest extends TestCase
         $manager = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
         $encoder = $this->getMockBuilder(UserPasswordHasherInterface::class)->getMock();
         $userClass = $this->getMockBuilder(CommandUserInterface::class)->getMock();
+        $accessor = $this->getMockBuilder(PropertyAccessorInterface::class)->getMock();
 
-        yield ['manager' => $manager, 'encoder' => $encoder, 'userClass' => $userClass];
+        yield ['manager' => $manager, 'encoder' => $encoder, 'userClass' => $userClass, 'accessor' => $accessor];
     }
 }
