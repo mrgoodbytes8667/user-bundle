@@ -23,14 +23,14 @@
     "authors": [
         {
             "name": "MrGoodBytes",
-            "email": "bytes@goodbytes.live"
+            "email": "bytes@mrgoodbytes.dev"
         }
     ],
     "config": {
         "sort-packages": true
     },
     "conflict": {
-        "phpunit/phpunit": "<9.5"
+        "phpunit/phpunit": "<9.5 >=10"
     },
     "autoload": {
         "psr-4": {
