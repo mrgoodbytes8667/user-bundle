@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,7 +29,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class CreateUserCommand
  * @package Bytes\UserBundle\Command
  */
-#[\Symfony\Component\Console\Attribute\AsCommand('bytes:user:create', 'Create a user')]
+#[AsCommand('bytes:user:create', description: 'Create a user')]
 class CreateUserCommand extends AbstractUserCommand
 {
     use RoleTrait;
@@ -61,7 +62,6 @@ class CreateUserCommand extends AbstractUserCommand
     {
         parent::configure();
         $this
-            ->setDescription(self::$defaultDescription)
             ->addArgument('useridentifier', InputArgument::REQUIRED, 'Useridentifier')
             ->addArgument('email', InputArgument::OPTIONAL, 'Email address')
             ->setHelp(<<<'EOT'

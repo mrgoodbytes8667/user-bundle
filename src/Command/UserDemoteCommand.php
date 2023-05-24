@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @license MIT
  * @link https://github.com/FriendsOfSymfony/FOSUserBundle
  */
-#[AsCommand('bytes:user:demote')]
+#[AsCommand('bytes:user:demote', description: 'Demote a user by removing a role')]
 class UserDemoteCommand extends RoleCommand
 {
     /**
@@ -45,7 +45,6 @@ class UserDemoteCommand extends RoleCommand
         parent::configure();
 
         $this
-            ->setDescription('Demote a user by removing a role')
             ->setHelp(<<<'EOT'
 The <info>bytes:user:demote</info> command demotes a user by removing a role
   <info>php %command.full_name% john.doe ROLE_CUSTOM</info>

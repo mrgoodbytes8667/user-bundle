@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @license MIT
  * @link https://github.com/FriendsOfSymfony/FOSUserBundle
  */
-#[AsCommand('bytes:user:promote')]
+#[AsCommand('bytes:user:promote', description: 'Promotes a user by adding a role')]
 class UserPromoteCommand extends RoleCommand
 {
     private ArrayCollection $roles;
@@ -58,7 +58,6 @@ class UserPromoteCommand extends RoleCommand
         parent::configure();
 
         $this
-            ->setDescription('Promotes a user by adding a role')
             ->setHelp(<<<'EOT'
 The <info>bytes:user:promote</info> command promotes a user by adding a role
   <info>php %command.full_name% john.doe ROLE_CUSTOM</info>

@@ -30,7 +30,7 @@ use function Symfony\Component\String\u;
  * @license MIT
  * @link https://github.com/FriendsOfSymfony/FOSUserBundle
  */
-#[AsCommand('bytes:user:change-password')]
+#[AsCommand('bytes:user:change-password', description: 'Change the password of a user.')]
 class UserChangePasswordCommand extends AbstractUserCommand
 {
     use UsernameCompletionTrait;
@@ -65,7 +65,6 @@ class UserChangePasswordCommand extends AbstractUserCommand
     protected function configure()
     {
         $this
-            ->setDescription('Change the password of a user.')
             ->setDefinition([
                 new InputArgument('useridentifier', InputArgument::REQUIRED, 'The user identifier'),
                 new InputArgument('password', InputArgument::REQUIRED, 'The password'),
