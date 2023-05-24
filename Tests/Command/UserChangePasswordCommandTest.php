@@ -3,6 +3,7 @@
 namespace Bytes\UserBundle\Tests\Command;
 
 use Bytes\Tests\Common\TestExtractorTrait;
+use Bytes\Tests\Common\TestValidatorTrait;
 use Bytes\UserBundle\Command\UserChangePasswordCommand;
 use Bytes\UserBundle\Command\UserPromoteCommand;
 use Bytes\UserBundle\Entity\CommandUserInterface;
@@ -26,7 +27,7 @@ use PHPUnit\Framework\MockObject\Rule\InvokedCount;
  */
 class UserChangePasswordCommandTest extends TestCase
 {
-    use TestExtractorTrait;
+    use TestExtractorTrait, TestValidatorTrait;
 
     /**
      * @dataProvider provideMocks
@@ -44,7 +45,7 @@ class UserChangePasswordCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, false, 2, $encoder, $this->createValidator(), $repo);
         $command->setAccessor($accessor);
         $tester = new CommandTester($command);
 
@@ -79,14 +80,127 @@ class UserChangePasswordCommandTest extends TestCase
     {
         $repo = $this->getMockRepo();
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, false, 2, $encoder, $this->createValidator(), $repo);
         $command->setAccessor($accessor);
         $tester = new CommandTester($command);
 
         $this->expectException(InvalidArgumentException::class);
 
         $tester->execute(['useridentifier' => 'john', 'password' => 'abc123']);
+    }
 
+    /**
+     * @dataProvider provideMocks
+     * @param $manager
+     * @param $encoder
+     * @param $userClass
+     * @param $accessor
+     */
+    public function testUserChangePasswordCommandExecuteBlankPassword($manager, $encoder, $userClass, $accessor)
+    {
+        $repo = $this->getMockRepo();
+
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, false, 2, $encoder, $this->createValidator(), $repo);
+        $command->setAccessor($accessor);
+        $tester = new CommandTester($command);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $tester->execute(['useridentifier' => 'john', 'password' => ' ']);
+    }
+
+    /**
+     * @dataProvider provideMocks
+     * @param $manager
+     * @param $encoder
+     * @param $userClass
+     * @param $accessor
+     */
+    public function testUserChangePasswordCommandExecuteCompromisedPasswordSuccess($manager, $encoder, $userClass, $accessor)
+    {
+        $user = User::random('john');
+        $repo = $this->getMockRepo($user);
+        $encoder->expects($this->once())
+            ->method('hashPassword')
+            ->willReturnArgument(1);
+
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', true, false, 2, $encoder, $this->createValidator(), $repo);
+        $command->setAccessor($accessor);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['useridentifier' => 'john', 'password' => 'gdfhoLkh435lhdfglksdr384tg;lkdhfrgkljdfhsg']);
+        $this->assertEquals(Command::SUCCESS, $tester->getStatusCode());
+    }
+
+    /**
+     * @dataProvider provideMocks
+     * @param $manager
+     * @param $encoder
+     * @param $userClass
+     * @param $accessor
+     */
+    public function testUserChangePasswordCommandExecuteCompromisedPasswordFailure($manager, $encoder, $userClass, $accessor)
+    {
+        $user = User::random('john');
+        $repo = $this->getMockRepo($user);
+        $encoder->expects($this->once())
+            ->method('hashPassword')
+            ->willReturnArgument(1);
+
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', true, false, 2, $encoder, $this->createValidator(), $repo);
+        $command->setAccessor($accessor);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['useridentifier' => 'john', 'password' => 'abc123']);
+        $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
+    }
+
+    /**
+     * @requires function \Symfony\Component\Validator\Constraints\PasswordStrength::__construct
+     * @dataProvider provideMocks
+     * @param $manager
+     * @param $encoder
+     * @param $userClass
+     * @param $accessor
+     */
+    public function testUserChangePasswordCommandExecutePasswordStrengthSuccess($manager, $encoder, $userClass, $accessor)
+    {
+        $user = User::random('john');
+        $repo = $this->getMockRepo($user);
+        $encoder->expects($this->once())
+            ->method('hashPassword')
+            ->willReturnArgument(1);
+
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, true, 2, $encoder, $this->createValidator(), $repo);
+        $command->setAccessor($accessor);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['useridentifier' => 'john', 'password' => 'gdfhoLkh435lhdfglksdr384tg;lkdhfrgkljdfhsg']);
+        $this->assertEquals(Command::SUCCESS, $tester->getStatusCode());
+    }
+
+    /**
+     * @requires function \Symfony\Component\Validator\Constraints\PasswordStrength::__construct
+     * @dataProvider provideMocks
+     * @param $manager
+     * @param $encoder
+     * @param $userClass
+     * @param $accessor
+     */
+    public function testUserChangePasswordCommandExecutePasswordStrengthFailure($manager, $encoder, $userClass, $accessor)
+    {
+        $user = User::random('john');
+        $repo = $this->getMockRepo($user);
+        $encoder->expects($this->once())
+            ->method('hashPassword')
+            ->willReturnArgument(1);
+
+        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, true, 2, $encoder, $this->createValidator(), $repo);
+        $command->setAccessor($accessor);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['useridentifier' => 'john', 'password' => 'abc123']);
+        $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
     /**
@@ -115,7 +229,7 @@ class UserChangePasswordCommandTest extends TestCase
         foreach ($this->provideMocks() as $mocks) {
             list('manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor, 'encoder' => $encoder) = $mocks;
 
-            $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', $encoder, $repo);
+            $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, false, 2, $encoder, $this->createValidator(), $repo);
             $command->setAccessor($accessor);
 
             $tester = new CommandCompletionTester($command);

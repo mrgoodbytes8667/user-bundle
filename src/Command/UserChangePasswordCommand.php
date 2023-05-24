@@ -2,6 +2,7 @@
 
 namespace Bytes\UserBundle\Command;
 
+use Bytes\CommandBundle\Exception\CommandRuntimeException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -14,6 +15,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use function Symfony\Component\String\u;
 
 /**
  * Class UserChangePasswordCommand
@@ -36,10 +42,14 @@ class UserChangePasswordCommand extends AbstractUserCommand
      * @param EntityManagerInterface $manager
      * @param string $userClass
      * @param string $userIdentifier
+     * @param bool $validateNotCompromisedPassword
+     * @param bool $validatePasswordStrength
+     * @param int $validatePasswordStrengthMinScore
      * @param UserPasswordHasherInterface $encoder
+     * @param ValidatorInterface $validator
      * @param ServiceEntityRepository|null $repo
      */
-    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private UserPasswordHasherInterface $encoder, ?ServiceEntityRepository $repo = null)
+    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private bool $validateNotCompromisedPassword, private bool $validatePasswordStrength, private int $validatePasswordStrengthMinScore, private UserPasswordHasherInterface $encoder, private ValidatorInterface $validator, ?ServiceEntityRepository $repo = null)
     {
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
     }
@@ -103,7 +113,23 @@ EOT
             throw new InvalidArgumentException('The supplied user identifier is not found.');
         }
 
-        $password = $this->encoder->hashPassword($user, $this->input->getArgument('password'));
+        $plainPassword = u($this->input->getArgument('password'))->trim()->toString();
+        $validators = [
+            new NotBlank()
+        ];
+        if ($this->validateNotCompromisedPassword) {
+            $validators[] = new NotCompromisedPassword();
+        }
+        if ($this->validatePasswordStrength && class_exists(\Symfony\Component\Validator\Constraints\PasswordStrength::class)) {
+            $validators[] = new \Symfony\Component\Validator\Constraints\PasswordStrength(minScore: $this->validatePasswordStrengthMinScore);
+        }
+        $errors = $this->validator->validate($plainPassword, $validators);
+        if (count($errors) > 0) {
+            $previous = new ValidatorException((string)$errors);
+            throw new CommandRuntimeException($previous->getMessage(), displayMessage: true, code: $previous->getCode(), previous: $previous);
+        }
+
+        $password = $this->encoder->hashPassword($user, $plainPassword);
         $user->setPassword($password);
 
         $this->entityManager->flush();
