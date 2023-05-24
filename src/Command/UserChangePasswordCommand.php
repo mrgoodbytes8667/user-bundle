@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\LogicException;
@@ -29,14 +30,10 @@ use function Symfony\Component\String\u;
  * @license MIT
  * @link https://github.com/FriendsOfSymfony/FOSUserBundle
  */
+#[AsCommand('bytes:user:change-password')]
 class UserChangePasswordCommand extends AbstractUserCommand
 {
     use UsernameCompletionTrait;
-
-    /**
-     * @var string|null The default command name
-     */
-    protected static $defaultName = 'bytes:user:change-password';
 
     /**
      * @param EntityManagerInterface $manager
@@ -49,7 +46,7 @@ class UserChangePasswordCommand extends AbstractUserCommand
      * @param ValidatorInterface $validator
      * @param ServiceEntityRepository|null $repo
      */
-    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private bool $validateNotCompromisedPassword, private bool $validatePasswordStrength, private int $validatePasswordStrengthMinScore, private UserPasswordHasherInterface $encoder, private ValidatorInterface $validator, ?ServiceEntityRepository $repo = null)
+    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private readonly bool $validateNotCompromisedPassword, private readonly bool $validatePasswordStrength, private readonly int $validatePasswordStrengthMinScore, private readonly UserPasswordHasherInterface $encoder, private readonly ValidatorInterface $validator, ?ServiceEntityRepository $repo = null)
     {
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
     }
@@ -120,9 +117,11 @@ EOT
         if ($this->validateNotCompromisedPassword) {
             $validators[] = new NotCompromisedPassword();
         }
+        
         if ($this->validatePasswordStrength && class_exists(\Symfony\Component\Validator\Constraints\PasswordStrength::class)) {
             $validators[] = new \Symfony\Component\Validator\Constraints\PasswordStrength(minScore: $this->validatePasswordStrengthMinScore);
         }
+        
         $errors = $this->validator->validate($plainPassword, $validators);
         if (count($errors) > 0) {
             $previous = new ValidatorException((string)$errors);

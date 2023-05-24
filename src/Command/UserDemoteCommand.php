@@ -5,6 +5,7 @@ namespace Bytes\UserBundle\Command;
 use Bytes\UserBundle\Entity\CommandUserInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -17,13 +18,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @license MIT
  * @link https://github.com/FriendsOfSymfony/FOSUserBundle
  */
+#[AsCommand('bytes:user:demote')]
 class UserDemoteCommand extends RoleCommand
 {
-    /**
-     * @var string
-     */
-    protected static $defaultName = 'bytes:user:demote';
-
     /**
      * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
      */

@@ -14,8 +14,8 @@ trait CommandUserTrait
 {
     /**
      * @var array
-     * @ORM\Column(type="json")
      */
+    #[ORM\Column(type: 'json')]
     protected $roles = [];
 
     /**
@@ -30,6 +30,7 @@ trait CommandUserTrait
             if (!is_string($role)) {
                 continue;
             }
+            
             if (in_array(strtoupper($role), $this->getRoles(), true)) {
                 return true;
             }

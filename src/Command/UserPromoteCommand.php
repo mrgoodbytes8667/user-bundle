@@ -6,6 +6,7 @@ use Bytes\UserBundle\Entity\CommandUserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -18,13 +19,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @license MIT
  * @link https://github.com/FriendsOfSymfony/FOSUserBundle
  */
+#[AsCommand('bytes:user:promote')]
 class UserPromoteCommand extends RoleCommand
 {
-    /**
-     * @var string
-     */
-    protected static $defaultName = 'bytes:user:promote';
-
     private ArrayCollection $roles;
 
     /**
@@ -44,6 +41,7 @@ class UserPromoteCommand extends RoleCommand
                     $this->addIfNotExists($role);
                 }
             }
+            
             $this->addIfNotExists($this->superAdminRole);
 
             $suggestions->suggestValues($this->roles->toArray());

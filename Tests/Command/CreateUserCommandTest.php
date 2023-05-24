@@ -36,7 +36,7 @@ class CreateUserCommandTest extends TestCase
         $repo->method('count')
             ->willReturn(0);
 
-        $encoder->expects($this->once())
+        $encoder->expects(self::once())
             ->method('hashPassword')
             ->willReturnArgument(1);
 
@@ -46,7 +46,7 @@ class CreateUserCommandTest extends TestCase
         $tester = new CommandTester($command);
 
         $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com']);
-        $this->assertEquals(Command::SUCCESS, $tester->getStatusCode());
+        self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
 
     }
 
@@ -80,7 +80,7 @@ class CreateUserCommandTest extends TestCase
         $tester = new CommandTester($command);
 
         $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com']);
-        $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
+        self::assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
     /**
@@ -93,7 +93,7 @@ class CreateUserCommandTest extends TestCase
     {
         $repo = $this->getMockRepo();
         $repo->method('count')
-            ->will($this->onConsecutiveCalls(0, 1));
+            ->will(self::onConsecutiveCalls(0, 1));
 
         $command = new CreateUserCommand(
             $manager, User::class, 'username', 'email', 'password', ['ROLE_ADMIN', 'ROLE_USER'], $encoder,
@@ -102,7 +102,7 @@ class CreateUserCommandTest extends TestCase
         $tester = new CommandTester($command);
 
         $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com']);
-        $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
+        self::assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
     /**
@@ -118,7 +118,7 @@ class CreateUserCommandTest extends TestCase
         $repo->method('count')
             ->willReturn(0);
 
-        $encoder->expects($this->once())
+        $encoder->expects(self::once())
             ->method('hashPassword')
             ->willReturnArgument(1);
 
@@ -128,7 +128,7 @@ class CreateUserCommandTest extends TestCase
         $tester = new CommandTester($command);
 
         $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake']);
-        $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
+        self::assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
     /**

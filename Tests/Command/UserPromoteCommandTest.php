@@ -37,10 +37,11 @@ class UserPromoteCommandTest extends TestCase
 
         $command = new UserPromoteCommand($manager, $userClass::class, 'username', repo: $repo);
         $command->setAccessor($accessor);
+        
         $tester = new CommandTester($command);
 
         $tester->execute(['useridentifier' => 'john', 'role' => 'ROLE_TEST']);
-        $this->assertEquals(Command::SUCCESS, $tester->getStatusCode());
+        self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
 
     }
 
@@ -52,7 +53,7 @@ class UserPromoteCommandTest extends TestCase
     {
         $repo = $this->getMockBuilder(ServiceEntityRepository::class)->disableOriginalConstructor()->getMock();
 
-        $repo->expects($this->once())
+        $repo->expects(self::once())
             ->method('findOneBy')
             ->willReturn($user);
 
@@ -66,10 +67,11 @@ class UserPromoteCommandTest extends TestCase
     {
         $user = User::random('john');
         $user->setRoles(array_merge($user->getRoles(), ['ROLE_USER', 'ROLE_TEST']));
-        $repo = $this->getMockRepoAll($user, $this->once());
+        
+        $repo = $this->getMockRepoAll($user, self::once());
 
-        foreach ($this->provideMocks() as $mocks) {
-            list('manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor) = $mocks;
+        foreach ($this->provideMocks() as $generator) {
+            list('manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor) = $generator;
 
             $command = new UserPromoteCommand($manager, $userClass::class, 'username', repo: $repo);
             $command->setAccessor($accessor);
@@ -79,7 +81,7 @@ class UserPromoteCommandTest extends TestCase
             $suggestions = $tester->complete($input);
 
             foreach ($expectedSuggestions as $expectedSuggestion) {
-                $this->assertContains($expectedSuggestion, $suggestions);
+                self::assertContains($expectedSuggestion, $suggestions);
             }
         }
     }

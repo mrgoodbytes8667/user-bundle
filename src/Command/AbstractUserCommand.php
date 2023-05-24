@@ -28,6 +28,7 @@ abstract class AbstractUserCommand extends BaseEntityManagerCommand
         {
             throw new \InvalidArgumentException('The provided user class must implement "\Symfony\Component\Security\Core\User\UserInterface"');
         }
+        
         parent::__construct($manager);
         if (is_null($repo)) {
             $this->repo = $manager->getRepository($userClass);

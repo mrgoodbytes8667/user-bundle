@@ -28,23 +28,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class CreateUserCommand
  * @package Bytes\UserBundle\Command
  */
+#[\Symfony\Component\Console\Attribute\AsCommand('bytes:user:create', 'Create a user')]
 class CreateUserCommand extends AbstractUserCommand
 {
     use RoleTrait;
 
-    /**
-     * @var string|null The default command name
-     */
-    protected static $defaultName = 'bytes:user:create';
-
-    /**
-     * @var string
-     */
-    protected static $defaultDescription = 'Create a user';
-
     public function __construct(
         EntityManagerInterface $manager, string $userClass, string $userIdentifier, protected string $userEmail,
-        protected string $userPassword, protected array $defaultRoles, private UserPasswordHasherInterface $encoder,
+        protected string $userPassword, protected array $defaultRoles, private readonly UserPasswordHasherInterface $encoder,
         protected PropertyInfoExtractorInterface $extractor, protected PropertyAccessorInterface $accessor,
         protected ValidatorInterface $validator, ?ServiceEntityRepository $repo = null)
     {
@@ -55,6 +46,7 @@ class CreateUserCommand extends AbstractUserCommand
                 throw new InvalidArgumentException('Default roles do not pass the validation test.');
             }
         }
+        
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
 
         if (!$extractor->isWritable($userClass, $userIdentifier)) {
@@ -156,6 +148,7 @@ EOT
             $this->io->error('User identifier is already in use.');
             return static::FAILURE;
         }
+        
         if ($this->repo->count([$this->userEmail => $email]) !== 0) {
             $this->io->error('Email address is already in use.');
             return static::FAILURE;
@@ -169,9 +162,11 @@ EOT
         if ($this->extractor->isWritable($this->userClass, $this->userEmail)) {
             $this->accessor->setValue($user, $this->userEmail, $email);
         }
+        
         if ($this->extractor->isWritable($this->userClass, $this->userPassword)) {
             $this->accessor->setValue($user, $this->userPassword, $this->encoder->hashPassword($user, $password));
         }
+        
         $user->setRoles($this->defaultRoles);
 
         $user = $this->initializeUser($user);

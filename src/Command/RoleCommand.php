@@ -49,6 +49,7 @@ abstract class RoleCommand extends AbstractUserCommand
         if (!is_subclass_of($userClass, CommandUserInterface::class)) {
             throw new InvalidArgumentException('The provided user class must implement "\Bytes\UserBundle\Entity\CommandUserInterface"');
         }
+        
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
     }
 
@@ -78,7 +79,7 @@ abstract class RoleCommand extends AbstractUserCommand
      * @param OutputInterface $output
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output;
         return parent::execute($input, $output);

@@ -140,6 +140,7 @@ class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
                 $roles[$index] = $role->prepend('Role_')->snake()->upper()->toString();
             }
         }
+        
         $this->roles = $roles;
         return $this;
     }

@@ -37,10 +37,11 @@ class UserDemoteCommandTest extends TestCase
 
         $command = new UserDemoteCommand($manager, $userClass::class, 'username', repo: $repo);
         $command->setAccessor($accessor);
+        
         $tester = new CommandTester($command);
 
         $tester->execute(['useridentifier' => 'john', 'role' => 'ROLE_TEST']);
-        $this->assertEquals(Command::SUCCESS, $tester->getStatusCode());
+        self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
 
     }
 
@@ -52,7 +53,7 @@ class UserDemoteCommandTest extends TestCase
     {
         $repo = $this->getMockBuilder(ServiceEntityRepository::class)->disableOriginalConstructor()->getMock();
 
-        $repo->expects($this->once())
+        $repo->expects(self::once())
             ->method('findOneBy')
             ->willReturn($user);
 
@@ -74,8 +75,8 @@ class UserDemoteCommandTest extends TestCase
         $repo->method('findAll')
             ->willReturn([$user]);
 
-        foreach ($this->provideMocks() as $mocks) {
-            list('manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor) = $mocks;
+        foreach ($this->provideMocks() as $generator) {
+            list('manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor) = $generator;
 
             $command = new UserDemoteCommand($manager, $userClass::class, 'username', repo: $repo);
             $command->setAccessor($accessor);
@@ -85,7 +86,7 @@ class UserDemoteCommandTest extends TestCase
             $suggestions = $tester->complete($input);
 
             foreach ($expectedSuggestions as $expectedSuggestion) {
-                $this->assertContains($expectedSuggestion, $suggestions);
+                self::assertContains($expectedSuggestion, $suggestions);
             }
         }
     }
