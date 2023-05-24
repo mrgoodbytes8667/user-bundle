@@ -58,7 +58,7 @@ class CreateUserCommand extends AbstractUserCommand
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
 
         if (!$extractor->isWritable($userClass, $userIdentifier)) {
-            throw new InvalidArgumentException('The provided user class does not have a settable username field.');
+            throw new InvalidArgumentException('The provided user class does not have a settable user identifier field.');
         }
     }
 
@@ -70,12 +70,12 @@ class CreateUserCommand extends AbstractUserCommand
         parent::configure();
         $this
             ->setDescription(self::$defaultDescription)
-            ->addArgument('username', InputArgument::REQUIRED, 'Username')
+            ->addArgument('useridentifier', InputArgument::REQUIRED, 'Useridentifier')
             ->addArgument('email', InputArgument::OPTIONAL, 'Email address')
             ->setHelp(<<<'EOT'
 The <info>bytes:user:create</info> command creates a user:
   <info>php %command.full_name% john</info>
-You will be prompted for a username and email address if not specified as arguments.
+You will be prompted for a user identifier and email address if not specified as arguments.
 EOT
             );
     }
@@ -88,20 +88,20 @@ EOT
     {
         $questions = [];
 
-        if (!$input->getArgument('username')) {
-            $question = new Question('Please enter a username:');
-            $question->setValidator(function ($username) {
-                if (empty($username)) {
-                    throw new Exception('Username cannot be empty');
+        if (!$input->getArgument('useridentifier')) {
+            $question = new Question('Please enter a user identifier:');
+            $question->setValidator(function ($useridentifier) {
+                if (empty($useridentifier)) {
+                    throw new Exception('User identifier cannot be empty');
                 }
 
-                if ($this->repo->count([$this->userIdentifier => $username]) !== 0) {
-                    throw new Exception('Username is already in use.');
+                if ($this->repo->count([$this->userIdentifier => $useridentifier]) !== 0) {
+                    throw new Exception('User Identifier is already in use.');
                 }
 
-                return $username;
+                return $useridentifier;
             });
-            $questions['username'] = $question;
+            $questions['useridentifier'] = $question;
         }
 
         if (!$input->getArgument('email')) {
@@ -139,7 +139,7 @@ EOT
      */
     protected function executeCommand(): int
     {
-        $username = $this->input->getArgument('username');
+        $username = $this->input->getArgument('useridentifier');
         $email = $this->input->getArgument('email');
         $password = ByteString::fromRandom(alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz~!@#$%^&*()-_+?.,');
 
@@ -153,7 +153,7 @@ EOT
         }
 
         if ($this->repo->count([$this->userIdentifier => $username]) !== 0) {
-            $this->io->error('Username is already in use.');
+            $this->io->error('User identifier is already in use.');
             return static::FAILURE;
         }
         if ($this->repo->count([$this->userEmail => $email]) !== 0) {
@@ -181,7 +181,7 @@ EOT
 
         $table = new Table($this->output);
         $table
-            ->setHeaders(['Username', 'Email', 'Generated Password'])
+            ->setHeaders(['User Identifier', 'Email', 'Generated Password'])
             ->setRows([
                 [$username, $email, $password],
             ])

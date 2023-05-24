@@ -4,8 +4,8 @@ namespace Bytes\UserBundle\Command;
 
 use Bytes\UserBundle\Entity\CommandUserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -39,10 +39,8 @@ class UserPromoteCommand extends RoleCommand
             $users = $this->repo->findAll() ?? [];
             $this->roles = new ArrayCollection();
 
-            foreach ($users as $user)
-            {
-                foreach ($user->getRoles() as $role)
-                {
+            foreach ($users as $user) {
+                foreach ($user->getRoles() as $role) {
                     $this->addIfNotExists($role);
                 }
             }
@@ -78,8 +76,8 @@ EOT
      *
      * @return mixed|void
      *
-     * @throws ORMException
      * @throws OptimisticLockException
+     * @throws ORMException
      */
     protected function executeRoleCommand(UserInterface $user, bool $super, string $role)
     {
@@ -87,17 +85,17 @@ EOT
             if (!$user->hasRole($this->superAdminRole)) {
                 $user->addRole($this->superAdminRole);
                 $this->entityManager->flush();
-                $this->output->writeln(sprintf('User "%s" has been promoted as a super administrator. This change will not apply until the user logs out and back in again.', $user->getUsername()));
+                $this->output->writeln(sprintf('User "%s" has been promoted as a super administrator. This change will not apply until the user logs out and back in again.', $user->getUserIdentifier()));
             } else {
-                $this->output->writeln(sprintf('User "%s" is already a super administrator.', $user->getUsername()));
+                $this->output->writeln(sprintf('User "%s" is already a super administrator.', $user->getUserIdentifier()));
             }
         } else {
             if (!$user->hasRole($role)) {
                 $user->addRole($role);
                 $this->entityManager->flush();
-                $this->output->writeln(sprintf('Role "%s" has been added to user "%s". This change will not apply until the user logs out and back in again.', $role, $user->getUsername()));
+                $this->output->writeln(sprintf('Role "%s" has been added to user "%s". This change will not apply until the user logs out and back in again.', $role, $user->getUserIdentifier()));
             } else {
-                $this->output->writeln(sprintf('User "%s" did already have "%s" role.', $user->getUsername(), $role));
+                $this->output->writeln(sprintf('User "%s" did already have "%s" role.', $user->getUserIdentifier(), $role));
             }
         }
     }

@@ -67,7 +67,7 @@ abstract class RoleCommand extends AbstractUserCommand
     {
         $this
             ->setDefinition([
-                new InputArgument('username', InputArgument::REQUIRED, 'The username'),
+                new InputArgument('useridentifier', InputArgument::REQUIRED, 'The user identifier'),
                 new InputArgument('role', InputArgument::OPTIONAL, 'The role'),
                 new InputOption('super', null, InputOption::VALUE_NONE, 'Instead specifying role, use this to quickly add the super administrator role'),
             ]);
@@ -89,7 +89,7 @@ abstract class RoleCommand extends AbstractUserCommand
      */
     protected function executeCommand(): int
     {
-        $username = $this->input->getArgument('username');
+        $username = $this->input->getArgument('useridentifier');
         $role = $this->input->getArgument('role');
         $super = (true === $this->input->getOption('super'));
 
@@ -108,7 +108,7 @@ abstract class RoleCommand extends AbstractUserCommand
 
         $user = $this->findUser($username);
         if (empty($user)) {
-            throw new InvalidArgumentException('The supplied username is not found.');
+            throw new InvalidArgumentException('The supplied user identifier is not found.');
         }
 
         $this->executeRoleCommand($user, $super, $role);
@@ -146,16 +146,16 @@ abstract class RoleCommand extends AbstractUserCommand
     {
         $questions = [];
 
-        if (!$input->getArgument('username')) {
-            $question = new Question('Please choose a username:');
+        if (!$input->getArgument('useridentifier')) {
+            $question = new Question('Please choose a user identifier:');
             $question->setValidator(function ($username) {
                 if (empty($username)) {
-                    throw new Exception('Username can not be empty');
+                    throw new Exception('User identifier can not be empty');
                 }
 
                 return $username;
             });
-            $questions['username'] = $question;
+            $questions['useridentifier'] = $question;
         }
 
         if ((true !== $input->getOption('super')) && !$input->getArgument('role')) {

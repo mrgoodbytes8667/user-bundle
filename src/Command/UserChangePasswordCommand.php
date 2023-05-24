@@ -60,7 +60,7 @@ class UserChangePasswordCommand extends AbstractUserCommand
         $this
             ->setDescription('Change the password of a user.')
             ->setDefinition([
-                new InputArgument('username', InputArgument::REQUIRED, 'The username'),
+                new InputArgument('useridentifier', InputArgument::REQUIRED, 'The user identifier'),
                 new InputArgument('password', InputArgument::REQUIRED, 'The password'),
             ])
             ->setHelp(<<<'EOT'
@@ -92,7 +92,7 @@ EOT
      */
     protected function executeCommand(): int
     {
-        $username = $this->input->getArgument('username');
+        $username = $this->input->getArgument('useridentifier');
 
         /** @var ServiceEntityRepository $repo */
         $repo = $this->repo;
@@ -100,7 +100,7 @@ EOT
         $user = $repo->findOneBy([$this->userIdentifier => $username]);
 
         if (empty($user)) {
-            throw new InvalidArgumentException('The supplied username is not found.');
+            throw new InvalidArgumentException('The supplied user identifier is not found.');
         }
 
         $password = $this->encoder->hashPassword($user, $this->input->getArgument('password'));
@@ -127,11 +127,11 @@ EOT
     {
         $questions = [];
 
-        if (!$input->getArgument('username')) {
-            $question = new Question('Please give the username:');
+        if (!$input->getArgument('useridentifier')) {
+            $question = new Question('Please provide the user identifier:');
             $question->setValidator(function ($username) {
                 if (empty($username)) {
-                    throw new Exception('Username can not be empty');
+                    throw new Exception('User identifier can not be empty');
                 }
 
                 return $username;
