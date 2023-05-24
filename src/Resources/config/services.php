@@ -19,9 +19,13 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_user.command.user_change_password', UserChangePasswordCommand::class)
         ->args([
             service('doctrine.orm.default_entity_manager'), // Doctrine\ORM\EntityManagerInterface
-            '',
-            '',
+            '', // user class
+            '', // user identifier
+            false,
+            false,
+            2,
             service('security.password_hasher'), // Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface
+            service('validator'),
         ])
         ->call('setAccessor', [service('property_accessor')])
         ->tag('console.command', ['command' => 'bytes:user:change-password']);
