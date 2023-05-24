@@ -45,7 +45,7 @@ class CreateUserCommandTest extends TestCase
             $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
         $tester = new CommandTester($command);
 
-        $tester->execute(['username' => 'john', 'email' => 'john@fake.com']);
+        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com']);
         $this->assertEquals(Command::SUCCESS, $tester->getStatusCode());
 
     }
@@ -79,7 +79,7 @@ class CreateUserCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester = new CommandTester($command);
 
-        $tester->execute(['username' => 'john', 'email' => 'john@fake.com']);
+        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com']);
         $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
@@ -101,7 +101,7 @@ class CreateUserCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester = new CommandTester($command);
 
-        $tester->execute(['username' => 'john', 'email' => 'john@fake.com']);
+        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com']);
         $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
@@ -127,7 +127,7 @@ class CreateUserCommandTest extends TestCase
             $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
         $tester = new CommandTester($command);
 
-        $tester->execute(['username' => 'john', 'email' => 'john@fake']);
+        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake']);
         $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 

@@ -48,7 +48,7 @@ class UserChangePasswordCommandTest extends TestCase
         $command->setAccessor($accessor);
         $tester = new CommandTester($command);
 
-        $tester->execute(['username' => 'john', 'password' => 'abc123']);
+        $tester->execute(['useridentifier' => 'john', 'password' => 'abc123']);
         $this->assertEquals(Command::SUCCESS, $tester->getStatusCode());
 
     }
@@ -85,7 +85,7 @@ class UserChangePasswordCommandTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
 
-        $tester->execute(['username' => 'john', 'password' => 'abc123']);
+        $tester->execute(['useridentifier' => 'john', 'password' => 'abc123']);
 
     }
 

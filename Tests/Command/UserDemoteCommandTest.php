@@ -39,7 +39,7 @@ class UserDemoteCommandTest extends TestCase
         $command->setAccessor($accessor);
         $tester = new CommandTester($command);
 
-        $tester->execute(['username' => 'john', 'role' => 'ROLE_TEST']);
+        $tester->execute(['useridentifier' => 'john', 'role' => 'ROLE_TEST']);
         $this->assertEquals(Command::SUCCESS, $tester->getStatusCode());
 
     }

@@ -3,8 +3,8 @@
 namespace Bytes\UserBundle\Command;
 
 use Bytes\UserBundle\Entity\CommandUserInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -32,7 +32,7 @@ class UserDemoteCommand extends RoleCommand
         parent::complete($input, $suggestions);
 
         if ($input->mustSuggestArgumentValuesFor('role')) {
-            $user = $this->findUser($input->getArgument('username'));
+            $user = $this->findUser($input->getArgument('useridentifier'));
 
             $suggestions->suggestValues($user->getRoles());
 
@@ -64,8 +64,8 @@ EOT
      *
      * @return mixed|void
      *
-     * @throws ORMException
      * @throws OptimisticLockException
+     * @throws ORMException
      */
     protected function executeRoleCommand(UserInterface $user, bool $super, string $role)
     {
@@ -73,17 +73,17 @@ EOT
             if ($user->hasRole($this->superAdminRole)) {
                 $user->removeRole($this->superAdminRole);
                 $this->entityManager->flush();
-                $this->output->writeln(sprintf('User "%s" has been demoted as a simple user. This change will not apply until the user logs out and back in again.', $user->getUsername()));
+                $this->output->writeln(sprintf('User "%s" has been demoted as a simple user. This change will not apply until the user logs out and back in again.', $user->getUserIdentifier()));
             } else {
-                $this->output->writeln(sprintf('User "%s" is already a super administrator.', $user->getUsername()));
+                $this->output->writeln(sprintf('User "%s" is already a super administrator.', $user->getUserIdentifier()));
             }
         } else {
             if ($user->hasRole($role)) {
                 $user->removeRole($role);
                 $this->entityManager->flush();
-                $this->output->writeln(sprintf('Role "%s" has been removed from user "%s". This change will not apply until the user logs out and back in again.', $role, $user->getUsername()));
+                $this->output->writeln(sprintf('Role "%s" has been removed from user "%s". This change will not apply until the user logs out and back in again.', $role, $user->getUserIdentifier()));
             } else {
-                $this->output->writeln(sprintf('User "%s" did not have "%s" role .', $user->getUsername(), $role));
+                $this->output->writeln(sprintf('User "%s" did not have "%s" role .', $user->getUserIdentifier(), $role));
             }
         }
     }

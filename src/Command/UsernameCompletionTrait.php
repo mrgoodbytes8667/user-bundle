@@ -26,7 +26,7 @@ trait UsernameCompletionTrait
      */
     protected function completeUsername(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
-        if ($input->mustSuggestArgumentValuesFor('username')) {
+        if ($input->mustSuggestArgumentValuesFor('useridentifier')) {
             $users = $this->repo->findAll();
 
             $suggestions->suggestValues(array_map(function ($value) {
