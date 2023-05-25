@@ -216,6 +216,7 @@ class CreateUserCommandTest extends TestCase
     }
 
     /**
+     * @requires function \Symfony\Component\Validator\Constraints\PasswordStrength::__construct
      * @dataProvider provideMocks
      * @param $manager
      * @param $encoder
@@ -235,6 +236,7 @@ class CreateUserCommandTest extends TestCase
     }
 
     /**
+     * @requires function \Symfony\Component\Validator\Constraints\PasswordStrength::__construct
      * @dataProvider provideMocks
      * @param $manager
      * @param $encoder
