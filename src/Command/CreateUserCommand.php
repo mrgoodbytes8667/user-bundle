@@ -13,6 +13,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -56,18 +57,32 @@ class CreateUserCommand extends AbstractUserCommand
     }
 
     /**
+     * @return string
+     */
+    private function generatePassword(): string
+    {
+        $this->input->setOption('generate-password', true);
+        return ByteString::fromRandom(alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz~!@#$%^&*()-_+?.,')->toString();
+    }
+
+    /**
      *
      */
     protected function configure()
     {
         parent::configure();
         $this
-            ->addArgument('useridentifier', InputArgument::REQUIRED, 'Useridentifier')
+            ->addArgument('useridentifier', InputArgument::REQUIRED, 'User identifier')
             ->addArgument('email', InputArgument::OPTIONAL, 'Email address')
+            ->addArgument('password', InputArgument::OPTIONAL, 'User password')
+            ->addOption('generate-password', mode: InputOption::VALUE_NEGATABLE, description: 'Bypass prompt for password and auto-generate', default: false)
             ->setHelp(<<<'EOT'
 The <info>bytes:user:create</info> command creates a user:
+
   <info>php %command.full_name% john</info>
-You will be prompted for a user identifier and email address if not specified as arguments.
+
+You will be prompted for a user identifier, email address, and password if not specified as arguments.
+
 EOT
             );
     }
@@ -88,7 +103,7 @@ EOT
                 }
 
                 if ($this->repo->count([$this->userIdentifier => $useridentifier]) !== 0) {
-                    throw new Exception('User Identifier is already in use.');
+                    throw new Exception('User identifier is already in use.');
                 }
 
                 return $useridentifier;
@@ -120,6 +135,23 @@ EOT
             $questions['email'] = $question;
         }
 
+        if($input->getOption('generate-password')) {
+            $input->setArgument('password', $this->generatePassword());
+        } else {
+            if (!$input->getArgument('password')) {
+                $question = new Question('Please enter the new password (or leave blank to have one generated for you):');
+                $question->setValidator(function ($password) {
+                    if (empty($password)) {
+                        $password = $this->generatePassword();
+                    }
+
+                    return $password;
+                });
+                $question->setHidden(true);
+                $questions['password'] = $question;
+            }
+        }
+
         foreach ($questions as $name => $question) {
             $answer = $this->getHelper('question')->ask($input, $output, $question);
             $input->setArgument($name, $answer);
@@ -133,7 +165,7 @@ EOT
     {
         $username = $this->input->getArgument('useridentifier');
         $email = $this->input->getArgument('email');
-        $password = ByteString::fromRandom(alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz~!@#$%^&*()-_+?.,');
+        $password = $this->input->getArgument('password');
 
         $errors = $this->validator->validate($email, [
             new NotBlank(),
@@ -178,7 +210,7 @@ EOT
         $table
             ->setHeaders(['User Identifier', 'Email', 'Generated Password'])
             ->setRows([
-                [$username, $email, $password],
+                [$username, $email, $this->input->getOption('generate-password') ? $password : '*****'],
             ])
             ->setStyle('borderless');
         $table->render();
@@ -187,7 +219,7 @@ EOT
     }
 
     /**
-     * Overloadable method to setup any initial fields on the user. Must return the modified user.
+     * Overloadable method to set up any initial fields on the user. Must return the modified user.
      * @param UserInterface $user
      * @return UserInterface
      */
