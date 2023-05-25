@@ -14,6 +14,7 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class CreateUserCommandTest
@@ -40,14 +41,55 @@ class CreateUserCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new CreateUserCommand(
-            $manager, User::class, 'username', 'email', 'password', ['ROLE_ADMIN', 'ROLE_USER'], $encoder,
-            $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, encoder: $encoder, repo: $repo);
 
-        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com']);
+        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com', 'password' => 'abc123']);
         self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
+    }
 
+    /**
+     * @dataProvider provideMocks
+     * @param $manager
+     * @param $encoder
+     * @throws Exception
+     */
+    public function testCreateUserCommandExecuteGeneratePassword($manager, $encoder)
+    {
+        $user = User::random('john');
+        $repo = $this->getMockRepo($user);
+        $repo->method('count')
+            ->willReturn(0);
+
+        $encoder->expects(self::once())
+            ->method('hashPassword')
+            ->willReturnArgument(1);
+
+        $tester = $this->getCommandTester(manager: $manager, encoder: $encoder, repo: $repo);
+
+        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com', '--generate-password' => true]);
+        self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
+    }
+
+    /**
+     * @param $manager
+     * @param $encoder
+     * @param ServiceEntityRepository $repo
+     * @param $userIdentifier
+     * @param string $userEmail
+     * @param string $userPassword
+     * @param array $defaultRoles
+     * @param $propertyInfo
+     * @param $accessor
+     * @param $userClass
+     * @param ValidatorInterface|null $validator
+     * @return CommandTester
+     */
+    private function getCommandTester($manager, $encoder, ServiceEntityRepository $repo, $userIdentifier = 'username', string $userEmail = 'email', string $userPassword = 'password', array $defaultRoles = ['ROLE_ADMIN', 'ROLE_USER'], $propertyInfo = null, $accessor = null, $userClass = User::class, ?ValidatorInterface $validator = null): CommandTester
+    {
+        $command = new CreateUserCommand(manager: $manager, userClass: $userClass, userIdentifier: $userIdentifier, userEmail: $userEmail, userPassword: $userPassword, defaultRoles: $defaultRoles, encoder: $encoder,
+            extractor: $propertyInfo ?? $this->propertyInfo, accessor: $accessor ?? $this->propertyAccessor, validator: $validator ?? $this->createValidator(), repo: $repo);
+
+        return new CommandTester($command);
     }
 
     /**
@@ -73,13 +115,9 @@ class CreateUserCommandTest extends TestCase
         $repo->method('count')
             ->willReturn(1);
 
-        $command = new CreateUserCommand(
-            $manager, User::class, 'username', 'email', 'password', ['ROLE_ADMIN', 'ROLE_USER'], $encoder,
-            $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
-        $tester = new CommandTester($command);
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, encoder: $encoder, repo: $repo);
 
-        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com']);
+        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com', '--generate-password' => true]);
         self::assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
@@ -95,13 +133,9 @@ class CreateUserCommandTest extends TestCase
         $repo->method('count')
             ->will(self::onConsecutiveCalls(0, 1));
 
-        $command = new CreateUserCommand(
-            $manager, User::class, 'username', 'email', 'password', ['ROLE_ADMIN', 'ROLE_USER'], $encoder,
-            $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
-        $tester = new CommandTester($command);
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, encoder: $encoder, repo: $repo);
 
-        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com']);
+        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake.com', '--generate-password' => true]);
         self::assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
@@ -122,12 +156,9 @@ class CreateUserCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new CreateUserCommand(
-            $manager, User::class, 'username', 'email', 'password', ['ROLE_ADMIN', 'ROLE_USER'], $encoder,
-            $this->propertyInfo, $this->propertyAccessor, $this->createValidator(), $repo);
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, encoder: $encoder, repo: $repo);
 
-        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake']);
+        $tester->execute(['useridentifier' => 'john', 'email' => 'john@fake', '--generate-password' => true]);
         self::assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
