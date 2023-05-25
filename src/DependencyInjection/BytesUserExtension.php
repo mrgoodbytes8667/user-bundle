@@ -34,9 +34,9 @@ class BytesUserExtension extends Extension implements ExtensionInterface
         $definition = $container->getDefinition('bytes_user.command.user_change_password');
         $definition->replaceArgument(1, $config['user_class']);
         $definition->replaceArgument(2, $config['entity']['identifier']);
-        $definition->replaceArgument(3, $config['password_validation']['not_compromised']);
-        $definition->replaceArgument(4, $config['password_validation']['password_strength']);
-        $definition->replaceArgument(5, $config['password_validation']['password_strength_min_score']);
+        $definition->addMethodCall('setValidateNotCompromisedPassword', [$config['password_validation']['not_compromised']]);
+        $definition->addMethodCall('setValidatePasswordStrength', [$config['password_validation']['password_strength']]);
+        $definition->addMethodCall('setValidatePasswordStrengthMinScore', [$config['password_validation']['password_strength_min_score']]);
 
         $definition = $container->getDefinition('bytes_user.command.user_create');
         $definition->replaceArgument(1, $config['user_class']);
@@ -44,6 +44,9 @@ class BytesUserExtension extends Extension implements ExtensionInterface
         $definition->replaceArgument(3, $config['entity']['email']);
         $definition->replaceArgument(4, $config['entity']['password']);
         $definition->replaceArgument(5, $config['default_roles']);
+        $definition->addMethodCall('setValidateNotCompromisedPassword', [$config['password_validation']['not_compromised']]);
+        $definition->addMethodCall('setValidatePasswordStrength', [$config['password_validation']['password_strength']]);
+        $definition->addMethodCall('setValidatePasswordStrengthMinScore', [$config['password_validation']['password_strength_min_score']]);
 
         $definition = $container->getDefinition('bytes_user.command.user_promote');
         $definition->replaceArgument(1, $config['user_class']);

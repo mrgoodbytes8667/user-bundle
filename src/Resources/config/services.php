@@ -21,13 +21,10 @@ return static function (ContainerConfigurator $container) {
             service('doctrine.orm.default_entity_manager'), // Doctrine\ORM\EntityManagerInterface
             '', // user class
             '', // user identifier
-            false,
-            false,
-            2,
             service('security.password_hasher'), // Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface
-            service('validator'),
         ])
         ->call('setAccessor', [service('property_accessor')])
+        ->call('setValidator', [service('validator')])
         ->tag('console.command', ['command' => 'bytes:user:change-password']);
 
     $services->set('bytes_user.command.user_create', CreateUserCommand::class)
@@ -41,8 +38,8 @@ return static function (ContainerConfigurator $container) {
             service('security.password_hasher'), // \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface
             service('property_info'),
             service('property_accessor'),
-            service('validator'),
         ])
+        ->call('setValidator', [service('validator')])
         ->tag('console.command', ['command' => 'bytes:user:create']);
 
     $services->set('bytes_user.command.user_promote', UserPromoteCommand::class)

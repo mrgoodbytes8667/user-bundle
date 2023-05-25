@@ -20,6 +20,7 @@ use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class UserChangePasswordCommandTest
@@ -45,14 +46,40 @@ class UserChangePasswordCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, false, 2, $encoder, $this->createValidator(), $repo);
-        $command->setAccessor($accessor);
-        
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, userClass: $userClass, encoder: $encoder, repo: $repo, accessor: $accessor);
 
         $tester->execute(['useridentifier' => 'john', 'password' => 'abc123']);
         self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
+    }
 
+    /**
+     * @param $manager
+     * @param $userClass
+     * @param $encoder
+     * @param ServiceEntityRepository $repo
+     * @param $accessor
+     * @param $userIdentifier
+     * @param bool $validateNotCompromisedPassword
+     * @param bool $validatePasswordStrength
+     * @param int $minScore
+     * @param ValidatorInterface|null $validator
+     * @param bool $isCompletion
+     * @return CommandCompletionTester|CommandTester
+     */
+    private function getCommandTester($manager, $userClass, $encoder, ServiceEntityRepository $repo, $accessor, $userIdentifier = 'username', bool $validateNotCompromisedPassword = false, bool $validatePasswordStrength = false, int $minScore = 2, ?ValidatorInterface $validator = null, bool $isCompletion = false): CommandCompletionTester|CommandTester
+    {
+        $command = new UserChangePasswordCommand($manager, $userClass::class, $userIdentifier, $encoder, $repo);
+        $command->setAccessor($accessor);
+        $command->setValidator($validator ?? $this->createValidator());
+        $command->setValidateNotCompromisedPassword($validateNotCompromisedPassword);
+        $command->setValidatePasswordStrength($validatePasswordStrength);
+        $command->setValidatePasswordStrengthMinScore($minScore);
+
+        if($isCompletion) {
+            return new CommandCompletionTester($command);
+        } else {
+            return new CommandTester($command);
+        }
     }
 
     /**
@@ -81,10 +108,7 @@ class UserChangePasswordCommandTest extends TestCase
     {
         $repo = $this->getMockRepo();
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, false, 2, $encoder, $this->createValidator(), $repo);
-        $command->setAccessor($accessor);
-        
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, userClass: $userClass, encoder: $encoder, repo: $repo, accessor: $accessor);
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -102,10 +126,7 @@ class UserChangePasswordCommandTest extends TestCase
     {
         $repo = $this->getMockRepo();
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, false, 2, $encoder, $this->createValidator(), $repo);
-        $command->setAccessor($accessor);
-        
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, userClass: $userClass, encoder: $encoder, repo: $repo, accessor: $accessor);
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -127,10 +148,7 @@ class UserChangePasswordCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', true, false, 2, $encoder, $this->createValidator(), $repo);
-        $command->setAccessor($accessor);
-        
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, userClass: $userClass, encoder: $encoder, repo: $repo, accessor: $accessor, validateNotCompromisedPassword: true);
 
         $tester->execute(['useridentifier' => 'john', 'password' => 'gdfhoLkh435lhdfglksdr384tg;lkdhfrgkljdfhsg']);
         self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
@@ -151,10 +169,7 @@ class UserChangePasswordCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', true, false, 2, $encoder, $this->createValidator(), $repo);
-        $command->setAccessor($accessor);
-        
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, userClass: $userClass, encoder: $encoder, repo: $repo, accessor: $accessor, validateNotCompromisedPassword: true);
 
         $tester->execute(['useridentifier' => 'john', 'password' => 'abc123']);
         self::assertEquals(Command::FAILURE, $tester->getStatusCode());
@@ -176,10 +191,7 @@ class UserChangePasswordCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, true, 2, $encoder, $this->createValidator(), $repo);
-        $command->setAccessor($accessor);
-        
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, userClass: $userClass, encoder: $encoder, repo: $repo, accessor: $accessor, validatePasswordStrength: true);
 
         $tester->execute(['useridentifier' => 'john', 'password' => 'gdfhoLkh435lhdfglksdr384tg;lkdhfrgkljdfhsg']);
         self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
@@ -201,10 +213,7 @@ class UserChangePasswordCommandTest extends TestCase
             ->method('hashPassword')
             ->willReturnArgument(1);
 
-        $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, true, 2, $encoder, $this->createValidator(), $repo);
-        $command->setAccessor($accessor);
-        
-        $tester = new CommandTester($command);
+        $tester = $this->getCommandTester(manager: $manager, userClass: $userClass, encoder: $encoder, repo: $repo, accessor: $accessor, validatePasswordStrength: true);
 
         $tester->execute(['useridentifier' => 'john', 'password' => 'abc123']);
         self::assertEquals(Command::FAILURE, $tester->getStatusCode());
@@ -237,10 +246,7 @@ class UserChangePasswordCommandTest extends TestCase
         foreach ($this->provideMocks() as $generator) {
             list('manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor, 'encoder' => $encoder) = $generator;
 
-            $command = new UserChangePasswordCommand($manager, $userClass::class, 'username', false, false, 2, $encoder, $this->createValidator(), $repo);
-            $command->setAccessor($accessor);
-
-            $tester = new CommandCompletionTester($command);
+            $tester = $this->getCommandTester(manager: $manager, userClass: $userClass, encoder: $encoder, repo: $repo, accessor: $accessor, isCompletion: true);
 
             $suggestions = $tester->complete($input);
 
