@@ -4,6 +4,7 @@ namespace Bytes\UserBundle\Command;
 
 use Bytes\CommandBundle\Exception\CommandRuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\String\ByteString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -69,5 +70,14 @@ trait PasswordValidationTrait
             $previous = new ValidatorException((string)$errors);
             throw new CommandRuntimeException($previous->getMessage(), displayMessage: true, code: $previous->getCode(), previous: $previous);
         }
+    }
+
+    /**
+     * @return string
+     */
+    private function generatePassword(): string
+    {
+        $this->input->setOption('generate-password', true);
+        return ByteString::fromRandom(alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz~!@#$%^&*()-_+?.,')->toString();
     }
 }

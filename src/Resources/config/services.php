@@ -38,8 +38,8 @@ return static function (ContainerConfigurator $container) {
             service('security.password_hasher'), // \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface
             service('property_info'),
             service('property_accessor'),
-            service('validator'),
         ])
+        ->call('setValidator', [service('validator')])
         ->tag('console.command', ['command' => 'bytes:user:create']);
 
     $services->set('bytes_user.command.user_promote', UserPromoteCommand::class)

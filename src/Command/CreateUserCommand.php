@@ -16,15 +16,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\String\ByteString;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Exception\ValidatorException;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class CreateUserCommand
@@ -33,36 +31,25 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[AsCommand('bytes:user:create', description: 'Create a user')]
 class CreateUserCommand extends AbstractUserCommand
 {
-    use RoleTrait;
+    use RoleTrait, PasswordValidationTrait;
 
     public function __construct(
-        EntityManagerInterface $manager, string $userClass, string $userIdentifier, protected string $userEmail,
-        protected string $userPassword, protected array $defaultRoles, private readonly UserPasswordHasherInterface $encoder,
+        EntityManagerInterface                   $manager, string $userClass, string $userIdentifier, protected string $userEmail,
+        protected string                         $userPassword, protected array $defaultRoles, private readonly UserPasswordHasherInterface $encoder,
         protected PropertyInfoExtractorInterface $extractor, protected PropertyAccessorInterface $accessor,
-        protected ValidatorInterface $validator, ?ServiceEntityRepository $repo = null)
+        ?ServiceEntityRepository                 $repo = null)
     {
-        foreach ($defaultRoles as $role)
-        {
-            if(!$this->validateRoleName($role))
-            {
+        foreach ($defaultRoles as $role) {
+            if (!$this->validateRoleName($role)) {
                 throw new InvalidArgumentException('Default roles do not pass the validation test.');
             }
         }
-        
+
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
 
         if (!$extractor->isWritable($userClass, $userIdentifier)) {
             throw new InvalidArgumentException('The provided user class does not have a settable user identifier field.');
         }
-    }
-
-    /**
-     * @return string
-     */
-    private function generatePassword(): string
-    {
-        $this->input->setOption('generate-password', true);
-        return ByteString::fromRandom(alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz~!@#$%^&*()-_+?.,')->toString();
     }
 
     /**
@@ -135,7 +122,7 @@ EOT
             $questions['email'] = $question;
         }
 
-        if($input->getOption('generate-password')) {
+        if ($input->getOption('generate-password')) {
             $input->setArgument('password', $this->generatePassword());
         } else {
             if (!$input->getArgument('password')) {
@@ -144,6 +131,8 @@ EOT
                     if (empty($password)) {
                         $password = $this->generatePassword();
                     }
+
+                    $this->validatePassword($password);
 
                     return $password;
                 });
@@ -180,11 +169,13 @@ EOT
             $this->io->error('User identifier is already in use.');
             return static::FAILURE;
         }
-        
+
         if ($this->repo->count([$this->userEmail => $email]) !== 0) {
             $this->io->error('Email address is already in use.');
             return static::FAILURE;
         }
+
+        $this->validatePassword($password);
 
         $class = $this->userClass;
         /** @var CommandUserInterface $user */
@@ -194,11 +185,11 @@ EOT
         if ($this->extractor->isWritable($this->userClass, $this->userEmail)) {
             $this->accessor->setValue($user, $this->userEmail, $email);
         }
-        
+
         if ($this->extractor->isWritable($this->userClass, $this->userPassword)) {
             $this->accessor->setValue($user, $this->userPassword, $this->encoder->hashPassword($user, $password));
         }
-        
+
         $user->setRoles($this->defaultRoles);
 
         $user = $this->initializeUser($user);
