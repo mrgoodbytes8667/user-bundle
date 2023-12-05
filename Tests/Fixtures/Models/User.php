@@ -180,7 +180,7 @@ class User implements CommandUserInterface, PasswordAuthenticatedUserInterface
     /**
      *
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 
