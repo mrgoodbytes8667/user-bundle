@@ -33,7 +33,8 @@
         "sort-packages": true
     },
     "conflict": {
-        "phpunit/phpunit": "<9.5 >=10"
+        "phpunit/phpunit": "<9.5 >=10",
+        "symfony/serializer": ">=7.0"
     },
     "autoload": {
         "psr-4": {
