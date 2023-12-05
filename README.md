@@ -10,7 +10,7 @@
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mrgoodbytes8667/user-bundle/release.yml?label=stable&logo=github&logoColor=FFF&style=flat)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mrgoodbytes8667/user-bundle/run-tests.yml?logo=github&logoColor=FFF&style=flat)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mrgoodbytes8667/user-bundle/run-tests-by-version.yml?logo=github&logoColor=FFF&style=flat)
-[![codecov](https://img.shields.io/codecov/c/github/mrgoodbytes8667/user-bundle?logo=codecov/0.4&logoColor=FFF&style=flat)](https://codecov.io/gh/mrgoodbytes8667/user-bundle)  
+[![codecov](https://img.shields.io/codecov/c/github/mrgoodbytes8667/user-bundle?logo=codecov/0.5&logoColor=FFF&style=flat)](https://codecov.io/gh/mrgoodbytes8667/user-bundle)  
 User management commands inspired by [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle)
 
 ## Installation
