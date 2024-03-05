@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Bytes\UserBundle\Command;
-
 
 use Bytes\UserBundle\Entity\CommandUserInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -25,19 +23,19 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Exception\ValidatorException;
 
 /**
- * Class CreateUserCommand
- * @package Bytes\UserBundle\Command
+ * Class CreateUserCommand.
  */
 #[AsCommand('bytes:user:create', description: 'Create a user')]
 class CreateUserCommand extends AbstractUserCommand
 {
-    use RoleTrait, PasswordValidationTrait;
+    use RoleTrait;
+    use PasswordValidationTrait;
 
     public function __construct(
-        EntityManagerInterface                   $manager, string $userClass, string $userIdentifier, protected string $userEmail,
-        protected string                         $userPassword, protected array $defaultRoles, private readonly UserPasswordHasherInterface $encoder,
+        EntityManagerInterface $manager, string $userClass, string $userIdentifier, protected string $userEmail,
+        protected string $userPassword, protected array $defaultRoles, private readonly UserPasswordHasherInterface $encoder,
         protected PropertyInfoExtractorInterface $extractor, protected PropertyAccessorInterface $accessor,
-        ?ServiceEntityRepository                 $repo = null)
+        ServiceEntityRepository $repo = null)
     {
         foreach ($defaultRoles as $role) {
             if (!$this->validateRoleName($role)) {
@@ -52,9 +50,6 @@ class CreateUserCommand extends AbstractUserCommand
         }
     }
 
-    /**
-     *
-     */
     protected function configure()
     {
         parent::configure();
@@ -74,10 +69,6 @@ EOT
             );
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $questions = [];
@@ -89,7 +80,7 @@ EOT
                     throw new Exception('User identifier cannot be empty');
                 }
 
-                if ($this->repo->count([$this->userIdentifier => $useridentifier]) !== 0) {
+                if (0 !== $this->repo->count([$this->userIdentifier => $useridentifier])) {
                     throw new Exception('User identifier is already in use.');
                 }
 
@@ -105,16 +96,16 @@ EOT
                     throw new Exception('Email address cannot be empty');
                 }
 
-                if ($this->repo->count([$this->userEmail => $email]) !== 0) {
+                if (0 !== $this->repo->count([$this->userEmail => $email])) {
                     throw new Exception('Email address is already in use.');
                 }
 
                 $errors = $this->validator->validate($email, [
                     new NotBlank(),
-                    new Email()
+                    new Email(),
                 ]);
                 if (count($errors) > 0) {
-                    throw new ValidatorException((string)$errors);
+                    throw new ValidatorException((string) $errors);
                 }
 
                 return $email;
@@ -148,7 +139,7 @@ EOT
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function executeCommand(): int
     {
@@ -158,20 +149,23 @@ EOT
 
         $errors = $this->validator->validate($email, [
             new NotBlank(),
-            new Email()
+            new Email(),
         ]);
         if (count($errors) > 0) {
-            $this->io->error((string)$errors);
+            $this->io->error((string) $errors);
+
             return static::FAILURE;
         }
 
-        if ($this->repo->count([$this->userIdentifier => $username]) !== 0) {
+        if (0 !== $this->repo->count([$this->userIdentifier => $username])) {
             $this->io->error('User identifier is already in use.');
+
             return static::FAILURE;
         }
 
-        if ($this->repo->count([$this->userEmail => $email]) !== 0) {
+        if (0 !== $this->repo->count([$this->userEmail => $email])) {
             $this->io->error('Email address is already in use.');
+
             return static::FAILURE;
         }
 
@@ -211,7 +205,7 @@ EOT
 
     /**
      * Overloadable method to set up any initial fields on the user. Must return the modified user.
-     * @param UserInterface $user
+     *
      * @return UserInterface
      */
     protected function initializeUser(UserInterface $user)

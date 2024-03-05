@@ -12,11 +12,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class UserDemoteCommand
- * Based on the FOSUserBundle role commands
- * @package Bytes\UserBundle\Command
+ * Based on the FOSUserBundle role commands.
  *
  * @license MIT
- * @link https://github.com/FriendsOfSymfony/FOSUserBundle
+ *
+ * @see https://github.com/FriendsOfSymfony/FOSUserBundle
  */
 #[AsCommand('bytes:user:demote', description: 'Demote a user by removing a role')]
 class UserDemoteCommand extends RoleCommand
@@ -37,9 +37,6 @@ class UserDemoteCommand extends RoleCommand
         }
     }
 
-    /**
-     *
-     */
     protected function configure()
     {
         parent::configure();
@@ -55,8 +52,6 @@ EOT
 
     /**
      * @param CommandUserInterface $user
-     * @param bool $super
-     * @param string $role
      *
      * @return mixed|void
      *

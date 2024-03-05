@@ -1,19 +1,16 @@
 <?php
 
-
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Bytes\UserBundle\Command\CreateUserCommand;
 use Bytes\UserBundle\Command\UserChangePasswordCommand;
 use Bytes\UserBundle\Command\UserDemoteCommand;
 use Bytes\UserBundle\Command\UserPromoteCommand;
-use function Symfony\Component\String\u;
 
-/**
+/*
  * @param ContainerConfigurator $container
  */
 return static function (ContainerConfigurator $container) {
-
     $services = $container->services();
 
     $services->set('bytes_user.command.user_change_password', UserChangePasswordCommand::class)

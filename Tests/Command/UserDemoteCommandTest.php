@@ -10,24 +10,18 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Generator;
-use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- *
- */
 class UserDemoteCommandTest extends TestCase
 {
     use TestExtractorTrait;
 
     /**
      * @dataProvider provideMocks
-     * @param $manager
-     * @param $userClass
-     * @param $accessor
+     *
      * @throws Exception
      */
     public function testUserDemoteCommandExecute($manager, $userClass, $accessor)
@@ -37,19 +31,17 @@ class UserDemoteCommandTest extends TestCase
 
         $command = new UserDemoteCommand($manager, $userClass::class, 'username', repo: $repo);
         $command->setAccessor($accessor);
-        
+
         $tester = new CommandTester($command);
 
         $tester->execute(['useridentifier' => 'john', 'role' => 'ROLE_TEST']);
         self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
-
     }
 
     /**
-     * @param User|null $user
      * @return ServiceEntityRepository
      */
-    private function getMockRepo(?User $user = null)
+    private function getMockRepo(User $user = null)
     {
         $repo = $this->getMockBuilder(ServiceEntityRepository::class)->disableOriginalConstructor()->getMock();
 
@@ -104,9 +96,6 @@ class UserDemoteCommandTest extends TestCase
         yield ['manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor];
     }
 
-    /**
-     * @return Generator
-     */
     public function provideCompletionSuggestions(): Generator
     {
         yield 'search' => [[''], ['john']];

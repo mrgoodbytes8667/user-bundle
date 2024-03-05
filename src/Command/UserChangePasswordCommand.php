@@ -15,29 +15,24 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 use function Symfony\Component\String\u;
 
 /**
  * Class UserChangePasswordCommand
- * Based on the FOSUserBundle role commands
- * @package Bytes\UserBundle\Command
+ * Based on the FOSUserBundle role commands.
  *
  * @license MIT
- * @link https://github.com/FriendsOfSymfony/FOSUserBundle
+ *
+ * @see https://github.com/FriendsOfSymfony/FOSUserBundle
  */
 #[AsCommand('bytes:user:change-password', description: 'Change the password of a user.')]
 class UserChangePasswordCommand extends AbstractUserCommand
 {
-    use UsernameCompletionTrait, PasswordValidationTrait;
+    use UsernameCompletionTrait;
+    use PasswordValidationTrait;
 
-    /**
-     * @param EntityManagerInterface $manager
-     * @param string $userClass
-     * @param string $userIdentifier
-     * @param UserPasswordHasherInterface $encoder
-     * @param ServiceEntityRepository|null $repo
-     */
-    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private readonly UserPasswordHasherInterface $encoder, ?ServiceEntityRepository $repo = null)
+    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, private readonly UserPasswordHasherInterface $encoder, ServiceEntityRepository $repo = null)
     {
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
     }
@@ -78,9 +73,6 @@ EOT
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
      * @return int 0 if everything went fine, or an exit code
      *
      * @throws LogicException When this abstract method is not implemented
@@ -119,9 +111,6 @@ EOT
      * This method is executed before the InputDefinition is validated.
      * This means that this is the only place where the command can
      * interactively ask for values of missing required arguments.
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {

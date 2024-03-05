@@ -5,7 +5,6 @@ namespace Bytes\UserBundle\Tests\Command;
 use Bytes\Tests\Common\TestExtractorTrait;
 use Bytes\Tests\Common\TestValidatorTrait;
 use Bytes\UserBundle\Command\UserChangePasswordCommand;
-use Bytes\UserBundle\Command\UserPromoteCommand;
 use Bytes\UserBundle\Entity\CommandUserInterface;
 use Bytes\UserBundle\Tests\Fixtures\Models\User;
 use Bytes\UserBundle\Tests\Fixtures\UserPasswordHasherInterface;
@@ -14,28 +13,24 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class UserChangePasswordCommandTest
- * @package Bytes\UserBundle\Tests\Command
+ * Class UserChangePasswordCommandTest.
  */
 class UserChangePasswordCommandTest extends TestCase
 {
-    use TestExtractorTrait, TestValidatorTrait;
+    use TestExtractorTrait;
+    use TestValidatorTrait;
 
     /**
      * @dataProvider provideMocks
-     * @param $manager
-     * @param $encoder
-     * @param $userClass
-     * @param $accessor
+     *
      * @throws Exception
      */
     public function testUserChangePasswordCommandExecute($manager, $encoder, $userClass, $accessor)
@@ -52,21 +47,7 @@ class UserChangePasswordCommandTest extends TestCase
         self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
     }
 
-    /**
-     * @param $manager
-     * @param $userClass
-     * @param $encoder
-     * @param ServiceEntityRepository $repo
-     * @param $accessor
-     * @param $userIdentifier
-     * @param bool $validateNotCompromisedPassword
-     * @param bool $validatePasswordStrength
-     * @param int $minScore
-     * @param ValidatorInterface|null $validator
-     * @param bool $isCompletion
-     * @return CommandCompletionTester|CommandTester
-     */
-    private function getCommandTester($manager, $userClass, $encoder, ServiceEntityRepository $repo, $accessor, $userIdentifier = 'username', bool $validateNotCompromisedPassword = false, bool $validatePasswordStrength = false, int $minScore = 2, ?ValidatorInterface $validator = null, bool $isCompletion = false): CommandCompletionTester|CommandTester
+    private function getCommandTester($manager, $userClass, $encoder, ServiceEntityRepository $repo, $accessor, $userIdentifier = 'username', bool $validateNotCompromisedPassword = false, bool $validatePasswordStrength = false, int $minScore = 2, ValidatorInterface $validator = null, bool $isCompletion = false): CommandCompletionTester|CommandTester
     {
         $command = new UserChangePasswordCommand($manager, $userClass::class, $userIdentifier, $encoder, $repo);
         $command->setAccessor($accessor);
@@ -75,7 +56,7 @@ class UserChangePasswordCommandTest extends TestCase
         $command->setValidatePasswordStrength($validatePasswordStrength);
         $command->setValidatePasswordStrengthMinScore($minScore);
 
-        if($isCompletion) {
+        if ($isCompletion) {
             return new CommandCompletionTester($command);
         } else {
             return new CommandTester($command);
@@ -83,10 +64,9 @@ class UserChangePasswordCommandTest extends TestCase
     }
 
     /**
-     * @param User|null $user
      * @return ServiceEntityRepository
      */
-    private function getMockRepo(?User $user = null)
+    private function getMockRepo(User $user = null)
     {
         $repo = $this->getMockBuilder(ServiceEntityRepository::class)->disableOriginalConstructor()->getMock();
 
@@ -99,10 +79,6 @@ class UserChangePasswordCommandTest extends TestCase
 
     /**
      * @dataProvider provideMocks
-     * @param $manager
-     * @param $encoder
-     * @param $userClass
-     * @param $accessor
      */
     public function testUserChangePasswordCommandExecuteInvalidUser($manager, $encoder, $userClass, $accessor)
     {
@@ -117,10 +93,6 @@ class UserChangePasswordCommandTest extends TestCase
 
     /**
      * @dataProvider provideMocks
-     * @param $manager
-     * @param $encoder
-     * @param $userClass
-     * @param $accessor
      */
     public function testUserChangePasswordCommandExecuteBlankPassword($manager, $encoder, $userClass, $accessor)
     {
@@ -135,10 +107,6 @@ class UserChangePasswordCommandTest extends TestCase
 
     /**
      * @dataProvider provideMocks
-     * @param $manager
-     * @param $encoder
-     * @param $userClass
-     * @param $accessor
      */
     public function testUserChangePasswordCommandExecuteCompromisedPasswordSuccess($manager, $encoder, $userClass, $accessor)
     {
@@ -156,10 +124,6 @@ class UserChangePasswordCommandTest extends TestCase
 
     /**
      * @dataProvider provideMocks
-     * @param $manager
-     * @param $encoder
-     * @param $userClass
-     * @param $accessor
      */
     public function testUserChangePasswordCommandExecuteCompromisedPasswordFailure($manager, $encoder, $userClass, $accessor)
     {
@@ -177,11 +141,8 @@ class UserChangePasswordCommandTest extends TestCase
 
     /**
      * @requires function \Symfony\Component\Validator\Constraints\PasswordStrength::__construct
+     *
      * @dataProvider provideMocks
-     * @param $manager
-     * @param $encoder
-     * @param $userClass
-     * @param $accessor
      */
     public function testUserChangePasswordCommandExecutePasswordStrengthSuccess($manager, $encoder, $userClass, $accessor)
     {
@@ -199,11 +160,8 @@ class UserChangePasswordCommandTest extends TestCase
 
     /**
      * @requires function \Symfony\Component\Validator\Constraints\PasswordStrength::__construct
+     *
      * @dataProvider provideMocks
-     * @param $manager
-     * @param $encoder
-     * @param $userClass
-     * @param $accessor
      */
     public function testUserChangePasswordCommandExecutePasswordStrengthFailure($manager, $encoder, $userClass, $accessor)
     {
@@ -240,7 +198,7 @@ class UserChangePasswordCommandTest extends TestCase
     {
         $user = User::random('john');
         $user->setRoles(array_merge($user->getRoles(), ['ROLE_USER', 'ROLE_TEST']));
-        
+
         $repo = $this->getMockRepoAll($user, self::once());
 
         foreach ($this->provideMocks() as $generator) {
@@ -256,9 +214,6 @@ class UserChangePasswordCommandTest extends TestCase
         }
     }
 
-    /**
-     * @return Generator
-     */
     public function provideCompletionSuggestions(): Generator
     {
         yield 'search' => [[''], ['john']];
@@ -266,10 +221,9 @@ class UserChangePasswordCommandTest extends TestCase
     }
 
     /**
-     * @param User|null $user
      * @return ServiceEntityRepository
      */
-    private function getMockRepoAll(?User $user = null, ?InvokedCount $expects = null)
+    private function getMockRepoAll(User $user = null, InvokedCount $expects = null)
     {
         $repo = $this->getMockBuilder(ServiceEntityRepository::class)->disableOriginalConstructor()->getMock();
 
