@@ -16,18 +16,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- *
- */
 class UserPromoteCommandTest extends TestCase
 {
     use TestExtractorTrait;
 
     /**
      * @dataProvider provideMocks
-     * @param $manager
-     * @param $userClass
-     * @param $accessor
+     *
      * @throws Exception
      */
     public function testUserPromoteCommandExecute($manager, $userClass, $accessor)
@@ -37,19 +32,17 @@ class UserPromoteCommandTest extends TestCase
 
         $command = new UserPromoteCommand($manager, $userClass::class, 'username', repo: $repo);
         $command->setAccessor($accessor);
-        
+
         $tester = new CommandTester($command);
 
         $tester->execute(['useridentifier' => 'john', 'role' => 'ROLE_TEST']);
         self::assertEquals(Command::SUCCESS, $tester->getStatusCode());
-
     }
 
     /**
-     * @param User|null $user
      * @return ServiceEntityRepository
      */
-    private function getMockRepo(?User $user = null)
+    private function getMockRepo(User $user = null)
     {
         $repo = $this->getMockBuilder(ServiceEntityRepository::class)->disableOriginalConstructor()->getMock();
 
@@ -67,7 +60,7 @@ class UserPromoteCommandTest extends TestCase
     {
         $user = User::random('john');
         $user->setRoles(array_merge($user->getRoles(), ['ROLE_USER', 'ROLE_TEST']));
-        
+
         $repo = $this->getMockRepoAll($user, self::once());
 
         foreach ($this->provideMocks() as $generator) {
@@ -87,10 +80,9 @@ class UserPromoteCommandTest extends TestCase
     }
 
     /**
-     * @param User|null $user
      * @return ServiceEntityRepository
      */
-    private function getMockRepoAll(?User $user = null, ?InvokedCount $expects = null)
+    private function getMockRepoAll(User $user = null, InvokedCount $expects = null)
     {
         $repo = $this->getMockBuilder(ServiceEntityRepository::class)->disableOriginalConstructor()->getMock();
 
@@ -114,9 +106,6 @@ class UserPromoteCommandTest extends TestCase
         yield ['manager' => $manager, 'userClass' => $userClass, 'accessor' => $accessor];
     }
 
-    /**
-     * @return Generator
-     */
     public function provideCompletionSuggestions(): Generator
     {
         yield 'search' => [[''], ['john']];

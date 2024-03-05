@@ -13,11 +13,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class UserPromoteCommand
- * Based on the FOSUserBundle role commands
- * @package Bytes\UserBundle\Command
+ * Based on the FOSUserBundle role commands.
  *
  * @license MIT
- * @link https://github.com/FriendsOfSymfony/FOSUserBundle
+ *
+ * @see https://github.com/FriendsOfSymfony/FOSUserBundle
  */
 #[AsCommand('bytes:user:promote', description: 'Promotes a user by adding a role')]
 class UserPromoteCommand extends RoleCommand
@@ -41,7 +41,7 @@ class UserPromoteCommand extends RoleCommand
                     $this->addIfNotExists($role);
                 }
             }
-            
+
             $this->addIfNotExists($this->superAdminRole);
 
             $suggestions->suggestValues($this->roles->toArray());
@@ -50,9 +50,6 @@ class UserPromoteCommand extends RoleCommand
         }
     }
 
-    /**
-     *
-     */
     protected function configure()
     {
         parent::configure();
@@ -68,8 +65,6 @@ EOT
 
     /**
      * @param CommandUserInterface $user
-     * @param bool $super
-     * @param string $role
      *
      * @return mixed|void
      *
@@ -97,9 +92,6 @@ EOT
         }
     }
 
-    /**
-     * @param string $role
-     */
     protected function addIfNotExists(string $role): void
     {
         if (!$this->roles->contains($role)) {

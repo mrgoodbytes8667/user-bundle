@@ -4,7 +4,6 @@ namespace Bytes\UserBundle\Command;
 
 use Bytes\UserBundle\Entity\CommandUserInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
@@ -21,15 +20,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class RoleCommand
- * Based on the FOSUserBundle role commands
- * @package Bytes\UserBundle\Command
+ * Based on the FOSUserBundle role commands.
  *
  * @license MIT
- * @link https://github.com/FriendsOfSymfony/FOSUserBundle
+ *
+ * @see https://github.com/FriendsOfSymfony/FOSUserBundle
  */
 abstract class RoleCommand extends AbstractUserCommand
 {
-    use RoleTrait, UsernameCompletionTrait;
+    use RoleTrait;
+    use UsernameCompletionTrait;
 
     /**
      * @var OutputInterface
@@ -38,18 +38,13 @@ abstract class RoleCommand extends AbstractUserCommand
 
     /**
      * RoleCommand constructor.
-     * @param EntityManagerInterface $manager
-     * @param string $userClass
-     * @param string $userIdentifier
-     * @param string $superAdminRole
-     * @param ServiceEntityRepository|null $repo
      */
-    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, protected string $superAdminRole = 'ROLE_SUPER_ADMIN', ?ServiceEntityRepository $repo = null)
+    public function __construct(EntityManagerInterface $manager, string $userClass, string $userIdentifier, protected string $superAdminRole = 'ROLE_SUPER_ADMIN', ServiceEntityRepository $repo = null)
     {
         if (!is_subclass_of($userClass, CommandUserInterface::class)) {
             throw new InvalidArgumentException('The provided user class must implement "\Bytes\UserBundle\Entity\CommandUserInterface"');
         }
-        
+
         parent::__construct($manager, $userClass, $userIdentifier, $repo);
     }
 
@@ -74,14 +69,10 @@ abstract class RoleCommand extends AbstractUserCommand
             ]);
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output;
+
         return parent::execute($input, $output);
     }
 
@@ -119,18 +110,9 @@ abstract class RoleCommand extends AbstractUserCommand
 
     /**
      * @see Command
-     * @param UserInterface $user
-     * @param bool $super
-     * @param string $role
-     *
-     * @return mixed
      */
     abstract protected function executeRoleCommand(UserInterface $user, bool $super, string $role);
 
-    /**
-     * @param string $username
-     * @return UserInterface|null
-     */
     protected function findUser(string $username): ?UserInterface
     {
         $repo = $this->repo;

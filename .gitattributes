@@ -2,7 +2,7 @@
 /.github export-ignore
 /.gitignore export-ignore
 /.php-cs-fixer.dist.php export-ignore
+/codecov.yml export-ignore
 /phpunit.xml.dist export-ignore
 /rector.php export-ignore
 /Tests export-ignore
-

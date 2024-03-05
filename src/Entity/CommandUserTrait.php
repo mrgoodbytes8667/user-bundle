@@ -1,14 +1,11 @@
 <?php
 
-
 namespace Bytes\UserBundle\Entity;
-
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Trait CommandUserTrait
- * @package Bytes\UserBundle\Entity
+ * Trait CommandUserTrait.
  */
 trait CommandUserTrait
 {
@@ -20,8 +17,6 @@ trait CommandUserTrait
 
     /**
      * @param string|string[] $role
-     *
-     * @return bool
      */
     public function hasRole(string|array $role): bool
     {
@@ -30,7 +25,7 @@ trait CommandUserTrait
             if (!is_string($role)) {
                 continue;
             }
-            
+
             if (in_array(strtoupper($role), $this->getRoles(), true)) {
                 return true;
             }
@@ -40,7 +35,6 @@ trait CommandUserTrait
     }
 
     /**
-     * @return array
      * @see UserInterface
      */
     public function getRoles(): array
@@ -49,7 +43,6 @@ trait CommandUserTrait
     }
 
     /**
-     * @param array $roles
      * @return $this
      */
     public function setRoles(array $roles): self
@@ -60,8 +53,6 @@ trait CommandUserTrait
     }
 
     /**
-     * @param string $role
-     *
      * @return $this
      */
     public function addRole(string $role)
@@ -78,8 +69,6 @@ trait CommandUserTrait
     }
 
     /**
-     * @param string $role
-     *
      * @return $this
      */
     public function removeRole(string $role)

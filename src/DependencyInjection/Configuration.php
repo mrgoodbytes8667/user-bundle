@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Bytes\UserBundle\DependencyInjection;
 
 use Bytes\UserBundle\Entity\CommandUserInterface;
@@ -8,8 +7,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * Class Configuration
- * @package Bytes\UserBundle\DependencyInjection
+ * Class Configuration.
  */
 class Configuration implements ConfigurationInterface
 {
@@ -18,7 +16,7 @@ class Configuration implements ConfigurationInterface
      *
      * @return TreeBuilder The tree builder
      */
-    public function getConfigTreeBuilder(): \Symfony\Component\Config\Definition\Builder\TreeBuilder
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('bytes_user');
 
