@@ -8,12 +8,12 @@
         "doctrine/doctrine-bundle": "^2.3",
         "doctrine/orm": "^2.8",
         "mrgoodbytes8667/command-bundle": "^1.2.2 | ^2.0",
-        "symfony/console": "^6.2 | ^7.0",
-        "symfony/framework-bundle": "^6.2 | ^7.0",
-        "symfony/property-access": "^6.2 | ^7.0",
-        "symfony/property-info": "^6.2 | ^7.0",
-        "symfony/security-core": "^6.2 | ^7.0",
-        "symfony/validator": "^6.2 | ^7.0"
+        "symfony/console": "^6.4 | ^7.0",
+        "symfony/framework-bundle": "^6.4 | ^7.0",
+        "symfony/property-access": "^6.4 | ^7.0",
+        "symfony/property-info": "^6.4 | ^7.0",
+        "symfony/security-core": "^6.4 | ^7.0",
+        "symfony/validator": "^6.4 | ^7.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",
