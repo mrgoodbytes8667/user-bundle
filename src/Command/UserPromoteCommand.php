@@ -50,7 +50,7 @@ class UserPromoteCommand extends RoleCommand
         }
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
