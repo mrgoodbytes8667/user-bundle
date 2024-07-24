@@ -50,7 +50,7 @@ class CreateUserCommand extends AbstractUserCommand
         }
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this
@@ -69,7 +69,7 @@ EOT
             );
     }
 
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
         $questions = [];
 
